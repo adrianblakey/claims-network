@@ -45,6 +45,7 @@ concept Name {
   o String middleName optional
   o String lastName
   o String displayName optional
+  o String nickName optional
   o String suffix optional
 }
 
@@ -120,7 +121,7 @@ enum PatientsRelationshipToPolicyHolder {
 }
 
 /**
- * For enrollment
+ * For Member
  */
 enum RelationshipToSubscriber {
   o SPOUSE
@@ -136,7 +137,7 @@ enum RelationshipToSubscriber {
 }
 
 /**
- * For enrollment
+ * For Member
  */
 enum BenefitStatus {
   o ACTIVE 
@@ -196,7 +197,7 @@ concept DentalSubmittedOtherCoverage {
   o Name nameOfPolicyHolder         // aka subscriber
   o DateTime dateOfBirth
   o Gender gender
-  o String enrolleeId optional            // id of subscriber/policyholder
+  o String memberId optional            // id of subscriber/policyholder
   o String socialSecurityNumber optional  // one of these is mandatory
   o String planOrGroupNumber
   o PatientsRelationshipToPolicyHolder patientsRelationshipToPolicyHolder 
@@ -241,11 +242,11 @@ asset SubmittedDentalClaim extends DentalClaim {
   // Other coverage
   o DentalSubmittedOtherCoverage dentalSubmittedOtherCoverage optional
   // Policyholder/subscriber information
-  o Name enrolleeName
-  o Address enrolleeAddress 
-  o DateTime enrolleeDateOfBirth
-  o Gender enrolleeGender
-  o String enrolleeId                                 // ssn or plan-assigned id
+  o Name memberName
+  o Address memberAddress 
+  o DateTime memberDateOfBirth
+  o Gender memberGender
+  o String memberId                                 // ssn or plan-assigned id
   o String planOrGroupNumber                          // group identifier
   o String employerName                               // employer or group name
   // Patient information
@@ -349,10 +350,10 @@ concept ElectronicCommunication {
 }
 
 /**
- * Change to an enrollment
+ * Change to an member
  */
-asset EnrollmentChange identified by enrollmentChangeId {
-  o String enrollmentChangeId
+asset MemberChange identified by memberChangeId {
+  o String memberChangeId
   o Name newName optional  
   o String newSocialSecurityNumber optional
   o ElectronicCommunication[] newElectronicCommunications optional 
@@ -369,18 +370,18 @@ asset EnrollmentChange identified by enrollmentChangeId {
   o Address address optional 
 }
 
-asset EnrollmentAdditions identified by enrollmentAdditionsId {
-  o String enrollmentAdditionsId
-  o EnrollmentHeader header
-  --> EnrollmentAddition[] enrollmentAdditions // sort these so the subscriber goes first
+asset MemberAdditions identified by memberAdditionsId {
+  o String memberAdditionsId
+  o MemberHeader header
+  --> MemberAddition[] memberAdditions // sort these so the subscriber goes first
 }
 
 /**
  * Enroll a subscriber - someone directly insured
  * Enroll a member - dependent of a subscriber
  */
-asset EnrollmentAddition identified by enrollmentAdditionId {
-  o String enrollmentAdditionId
+asset MemberAddition identified by memberAdditionId {
+  o String memberAdditionId
   //o RelationshipToSubscriber relationshipToSubscriber 
   // Unique way to identify the subscriber SSN or ID or both
   // if the relationship is not SELF
@@ -410,31 +411,31 @@ asset EnrollmentAddition identified by enrollmentAdditionId {
   o String dateTimePeriodDescription optional
 }
 
-asset SubscriberEnrollmentAddition extends EnrollmentAddition {
+asset SubscriberAddition extends MemberAddition {
   o String employeeIdNumber optional
   o DateTime employmentBeginDate optional
 }
 
-asset MemberEnrollmentAddition extends EnrollmentAddition {
+asset DependentAddition extends SubscriberAddition {
   o RelationshipToSubscriber relationshipToSubscriber 
-  --> SubscriberEnrollmentAddition subscriberEnrollmentAddition
+  --> SubscriberAddition subscriberAddition
 }
 
 /**
- * Delete one or more enrollments 
+ * Delete one or more Members 
  */
-asset EnrollmentDeletions identified by enrollmentDeletionsId {
-  o String enrollmentDeletionsId
-  o EnrollmentHeader header
-  --> EnrollmentDelete[] enrollmentDeletions
+asset MemberDeletions identified by MemberDeletionsId {
+  o String MemberDeletionsId
+  o MemberHeader header
+  --> MemberDelete[] MemberDeletions
 }
 
 /**
- * Enrollee identifiers to delete, remove an 
+ * Member identifiers to delete, remove an 
  * erroneous add - todo ordering to undo a graph? members before subscriber
  */
-asset EnrollmentDelete identified by enrollmentDeleteId {
-  o String enrollmentDeleteId
+asset MemberDelete identified by MemberDeleteId {
+  o String MemberDeleteId
   // At least one unique way to identify the subscriber SSN or ID or both
   // if the relationship is not SELF
   o String identifier
@@ -467,9 +468,9 @@ asset Division extends OrganizationalEntity {
 }
 
 /**
- * Needed to identify every enrollment CRUD
+ * Needed to identify every Member CRUD
  */
-concept EnrollmentHeader {
+concept MemberHeader {
   // Payer identification
   o String payerNumber
   o String payerName optional
@@ -620,36 +621,48 @@ participant BillingProvider extends Provider {
  */
 participant Person identified by personId {
   o String personId
+  o String personalIdentifier optional
   o Name name 
   o Address address optional
   o ElectronicCommunication[] electronicCommunications optional
   o Phone[] phones optional 
   o Gender gender
-  o DateTime dateOfBirth  
+  o DateTime dateOfBirth 
+  o DateTime deathDate optional 
+  o DateTime deathNotificationDate optional 
+  o String causeOfDeath optional 
   o String socialSecurityNumber optional
+  o Boolean directiveOnFile default=false
+  o String desiredCommunicationMethod optional 
+  o String maritalStatus optional 
+  o String languageCode default='en-US'
+  o Boolean medicalNoPriorCoverage default=false
+  o Boolean dentalNoPriorCoverage default=false
+  o String ethnicity optional
+  o String race optional 
 }
 
 /**
  * Someone who is eligible for services by being enrolled in an insurance plan, AKA member
  */
-participant Enrollee extends Person {
+participant Member extends Person {
 }
 
 /**
  * A person who is enrolled in an insurance plan. AKA PolicyHolder
  */
-participant Subscriber extends Enrollee {
+participant Subscriber extends Member {
   o String employer optional
   --> Dependent[] dependents optional // just named depdendents
   --> SubscriberPlan[] subscriberPlans optional 
 }
 
 /**
- * Limit counters for and enrollee in a plan (TODO is this right? 
+ * Limit counters for and member in a plan (TODO is this right? 
  * plan == contract? lifetime counters?)
  */
-asset EnrolleePlan identified by enrolleePlanId {
-  o String enrolleePlanId
+asset MemberPlan identified by memberPlanId {
+  o String memberPlanId
   --> Counter[] counters optional            // The accumulation of benefits
 }
 
@@ -666,9 +679,9 @@ asset SubscriberPlan identified by subscriberPlanId {
 }
 
 /**
- * Dependent of the Enrollee/subscriber
+ * Dependent of the Member/subscriber
  */
-participant Dependent extends Enrollee {
+participant Dependent extends Member {
   o RelationshipToSubscriber relationshipToSubscriber
   --> Subscriber subscriber     // For which of the subscriber's plans?
 }
@@ -713,59 +726,59 @@ transaction PostTransaction {
 }
 
 /**
- * Add new enrollees(s)
+ * Add new members(s)
  * Add a new dependent, partner 
  */
-transaction AddEnrollees {
-  --> EnrollmentAdditions enrollmentAdditions
+transaction AddMembers {
+  --> MemberAdditions MemberAdditions
 }
 
 /**
  * Delete incorrect coverage record(s) - correct a mistake
  */
-transaction DeleteEnrollees {
-  --> EnrollmentDeletions enrollmentDeletions
+transaction DeleteMembers {
+  --> MemberDeletions MemberDeletions
 }
 
 /**
- * Change enrollee details like what?
+ * Change member details like what?
  * Change of address
  * Change of name
  * Change to COBRA
  * Remove a dependent (student, age 26, divorce ...)
  * 
  */
-transaction ChangeEnrollee {
+transaction ChangeMember {
 }
 
 /**
- * Cancel enrollee
+ * Cancel Member
  */
-transaction CancellEnrollee {
+transaction CancellMember {
 }
 
 /**
- * Reinstate enrollee
+ * Reinstate member
  */
-transaction ReinstateEnrollee {
+transaction ReinstateMember {
 }
 
 /**
- * Correct enrollee
+ * Correct member
  */
-transaction CorrectEnrollee {
+transaction CorrectMember {
 }
 
 /**
- * Audit/compare enrollee
+ * Audit/compare member
  */
-transaction AuditEnrollee {
+transaction AuditMember {
 }
 
 /**
  * Employee information
  */
-transaction InformationEnrollee {
+transaction InformationMember {
 }
 
 event StartAdjudicationEvent {
