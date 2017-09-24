@@ -3,20 +3,6 @@
  */
 namespace org.acme.claim
 
-enum TwoCharCountryCode {
-  o US
-  o UK
-}
-
-enum ThreeCharCountryCode {
-  o USA
-  o UKE
-}
-
-concept Country {
-  o TwoCharCountryCode twoCharCountryCode
-  o ThreeCharCountryCode threeCharCountryCode
-}
 
 /**
  * An address type - it will work for US it does not need to yet work for international
@@ -29,7 +15,7 @@ concept Address {
   o String county optional
   o String state 
   o String postcode
-  o Country country // is there a way to default this?
+  o String country default = "USA" // is there a way to default this?
 }
 
 enum PhoneType {
@@ -121,7 +107,7 @@ enum Title {
 /**
  * Person's name
  */
-concept Name {
+concept HumanName {
   o Title title optional
   o String prefix optional
   o String firstName
@@ -267,7 +253,7 @@ enum TreatmentResultingFrom {
  * Other coverage optionally submitted on a claim
  */
 concept DentalSubmittedOtherCoverage {
-  o Name nameOfPolicyHolder         // aka subscriber
+  o HumanName nameOfPolicyHolder         // aka subscriber
   o DateTime dateOfBirth
   o Gender gender
   o String memberId optional            // id of subscriber/policyholder
@@ -315,7 +301,7 @@ asset SubmittedDentalClaim extends DentalClaim {
   // Other coverage
   o DentalSubmittedOtherCoverage dentalSubmittedOtherCoverage optional
   // Policyholder/subscriber information
-  o Name memberName
+  o HumanName memberName
   o Address memberAddress 
   o DateTime memberDateOfBirth
   o Gender memberGender
@@ -324,7 +310,7 @@ asset SubmittedDentalClaim extends DentalClaim {
   o String employerName                               // employer or group name
   // Patient information
   o PatientsRelationshipToPolicyHolder patientsRelationshipToPolicyHolder
-  o Name patientName
+  o HumanName patientName
   o Address patientAddress
   o DateTime patientDateOfBirth
   o Gender patientGender
@@ -333,6 +319,7 @@ asset SubmittedDentalClaim extends DentalClaim {
   --> SubmittedDentalServiceLine[] submittedDentalServiceLines 
   o BigDecimal otherFees optional
   o BigDecimal totalFees optional                    // Calculated
+  o Double amount
   o String missingTeeth optional                             // comma separated list of teeth numbers
   o DiagnosisCodeListQualifier diagnosisCodeListQualifier optional
   o String diagnosisCodeA optional
@@ -354,7 +341,7 @@ asset SubmittedDentalClaim extends DentalClaim {
   o DateTime dateOfAccident optional
   o String autoAccidentState optional
   // Billing provider
-  o Name billingProviderName
+  o HumanName billingProviderName
   o Address billingProviderAddress
   o String billingProviderNpi
   o String billingProviderLicense
@@ -362,7 +349,7 @@ asset SubmittedDentalClaim extends DentalClaim {
   o String billingProviderPhoneNumber
   o String billingProviderAddlId optional  
   // Treating provider
-  o Name treatingProviderName optional
+  o HumanName treatingProviderName optional
   o String treatingProviderNpi
   o String treatingProviderLicense
   o Address treatingProviderAddress
@@ -416,7 +403,7 @@ asset AdjudicatedDentalClaim extends DentalClaim {
  */
 asset MemberChange identified by memberChangeId {
   o String memberChangeId
-  o Name newName optional  
+  o HumanName newName optional  
   o String newSocialSecurityNumber optional
   o ElectronicAddress[] newElectronicAddresses optional 
   o Phone[] newPhones optional 
@@ -425,7 +412,7 @@ asset MemberChange identified by memberChangeId {
   o Gender newGender optional
   // Existing member identifiers - one or more are needed to identify the member
   o String memberId optional                  // Insurance company's id 
-  o Name memberName optional
+  o HumanName memberName optional
   o String socialSecurityNumber optional
   o DateTime birthDate optional 
   o Gender gender optional 
@@ -451,7 +438,7 @@ asset MemberAddition identified by memberAdditionId {
   //o String subscriberId optional
   //o String subscriberSocialSecurityNumber optional
   // Subscriber to add if SELF, else member to add
-  o Name name
+  o HumanName name
   o Gender gender optional
   o Address address
   o String socialSecurityNumber optional // is there any tax reporting we need this for?
@@ -502,7 +489,7 @@ asset MemberDelete identified by MemberDeleteId {
   // if the relationship is not SELF
   o String identifier
   o String socialSecurityNumber optional
-  o Name name optional
+  o HumanName name optional
   o DateTime dateOfBirth optional 
 }
 
@@ -683,7 +670,7 @@ asset Payment identified by paymentId {
  */
 participant Provider identified by npi {
   o String npi
-  o Name name
+  o HumanName name
 }
 
 /**
@@ -701,7 +688,7 @@ participant BillingProvider extends Provider {
 participant Person identified by personId {
   o String personId
   o String personalIdentifier optional
-  o Name name 
+  o HumanName name 
   o Address address optional
   o ElectronicAddress[] electronicAddresses optional
   o Phone[] phones optional 
@@ -783,9 +770,15 @@ transaction CreateGroup {
 transaction CreateSubscriber {
 }
 
+/**
+ * Create a billing provider
+ */
 transaction CreateBillingProvider {
 }
 
+/**
+ * Adjudicate a submitted claim
+ */
 transaction AdjudicateDentalClaim {
   --> SubmittedDentalClaim submittedDentalClaim
 }

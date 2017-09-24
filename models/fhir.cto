@@ -1,0 +1,77 @@
+/**
+ * Claims business network definition.
+ */
+namespace org.hl7.fhir.datatypes
+
+abstract concept Element {
+
+}
+
+concept Instant extends Element {
+  o DateTime datetime 
+}
+
+concept Time extends Element {
+  o DateTime datetime
+}
+
+concept Date extends Element {
+  o DateTime datetime 
+}
+
+concept DateTime extends Element {
+  o DateTime datetime 
+}
+
+concept Decimal extends Element {
+  o Integer left
+  o Integer right
+}
+
+concept Integer extends Element {
+  o Integer integer 
+}
+
+ /*
+concept UnsignedInt extends org.hl7.fhir.datatypes.Integer {
+
+}
+
+concept PositiveInt extends Integer {
+  
+}
+*/
+
+concept String extends Element {
+  o String string
+}
+
+/*
+concept Code extends String {
+
+}
+
+concept Id extends String {
+
+}
+
+concept Markdown extends String {
+  o String Markdown extends String
+}
+*/
+
+concept Boolean extends Element {
+ // Boolean boolean
+}
+
+concept Base64Binary extends Element {
+
+}
+
+concept Uri extends Element {
+  o String string 
+}
+
+concept Oid extends Uri {
+  
+}

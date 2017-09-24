@@ -121,7 +121,7 @@ enum Title {
 /**
  * Person's name
  */
-concept Name {
+concept HumanName {
   o Title title optional
   o String prefix optional
   o String firstName
