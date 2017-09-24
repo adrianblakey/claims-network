@@ -95,6 +95,7 @@ enum TimeZone {
   o UTC_2
   o UTC_3
   o UTC_4
+  o UTCPLUS1
 }
 
 /**
@@ -103,4 +104,61 @@ enum TimeZone {
 concept Calendar {
   o Locale locale
   o TimeZone timezone
+}
+
+/**
+ * A person's title
+ */
+enum Title {
+  o Mr 
+  o Mrs 
+  o Ms 
+  o Mx 
+  o Miss
+  o Master
+}
+
+/**
+ * Person's name
+ */
+concept Name {
+  o Title title optional
+  o String prefix optional
+  o String firstName
+  o String middleName optional
+  o String lastName
+  o String displayName optional
+  o String nickName optional
+  o String suffix optional
+}
+
+/** 
+ * Blob types - for attachments 
+ */
+abstract concept Blob {
+  o String contents
+}
+
+concept JPEG extends Blob {
+  o String mimeType default = "image/jpeg"
+}
+
+concept TIFF extends Blob {
+  o String mimeType default = "image/tiff"
+}
+
+/**
+ * Represent decimal numbers - like money
+ */
+concept BigDecimal {
+  o Integer integerPart
+  o Integer fractionPart
+}
+
+/**
+ * A time period - from must be less than to
+ */
+concept Period {
+  o DateTime from 
+  o DateTime to 
 }

@@ -1,7 +1,6 @@
-# Claims Processing Business Network
+# Basic Sample Business Network
 
-> This is a proof of concept, which demonstrates the core functionality of Hyperledger Composer by modelling a health care
-claims processing system.
+> This is the "Hello World" of Hyperledger Composer samples, which demonstrates the core functionality of Hyperledger Composer by changing the value of an asset.
 
 This business network defines:
 

@@ -69,7 +69,7 @@ concept DentalSubmittedOtherCoverage {
   o String enrolleeId optional            // id of subscriber/policyholder
   o String socialSecurityNumber optional  // one of these is mandatory
   o String planOrGroupNumber
-  o PatientsRelationshipToPolicyHolder patientsRelationshipToPolicyHolder 
+//  o PatientsRelationshipToPolicyHolder patientsRelationshipToPolicyHolder 
   o String planName
   o Address planAddress
 }
@@ -88,7 +88,7 @@ asset DentalPlan identified by dentalPlanId {
  */
 abstract asset DentalClaim identified by dentalClaimId {
   o String dentalClaimId
-  o DentalClaimType dentalClaimType
+ // o DentalClaimType dentalClaimType
 }
 
 /**
@@ -119,7 +119,7 @@ asset SubmittedDentalClaim extends DentalClaim {
   o String planOrGroupNumber                          // group identifier
   o String employerName                               // employer or group name
   // Patient information
-  o PatientsRelationshipToPolicyHolder patientsRelationshipToPolicyHolder
+  // o PatientsRelationshipToPolicyHolder patientsRelationshipToPolicyHolder
   o Name patientName
   o Address patientAddress
   o DateTime patientDateOfBirth
@@ -202,7 +202,7 @@ asset AdjudicatedDentalServiceLine extends SubmittedDentalServiceLine {
 
 // The adjudicated claim - as it's processed 
 asset AdjudicatedDentalClaim extends DentalClaim {
-  o ClaimStatus claimStatus
+//  o ClaimStatus claimStatus
   o Double amount
   --> SubmittedDentalClaim submittedDentalClaim
 }
@@ -286,7 +286,7 @@ asset SubscriberEnrollmentAddition extends EnrollmentAddition {
 }
 
 asset MemberEnrollmentAddition extends EnrollmentAddition {
-  o RelationshipToSubscriber relationshipToSubscriber 
+//  o RelationshipToSubscriber relationshipToSubscriber 
   --> SubscriberEnrollmentAddition subscriberEnrollmentAddition
 }
 
@@ -539,7 +539,7 @@ asset SubscriberPlan identified by subscriberPlanId {
  * Dependent of the Enrollee/subscriber
  */
 participant Dependent extends Enrollee {
-  o RelationshipToSubscriber relationshipToSubscriber
+//  o RelationshipToSubscriber relationshipToSubscriber
   --> Subscriber subscriber     // For which of the subscriber's plans?
 }
 
