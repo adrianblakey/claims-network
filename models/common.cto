@@ -1,0 +1,106 @@
+/**
+ * Common resouces needed by all other namespaces
+ */
+namespace org.acme.common
+
+enum TwoCharCountryCode {
+  o US
+  o UK
+}
+
+enum ThreeCharCountryCode {
+  o USA
+  o UKE
+}
+
+concept Country {
+  o TwoCharCountryCode twoCharCountryCode
+  o ThreeCharCountryCode threeCharCountryCode
+}
+
+/**
+ * An address type - it will work for US it does not need to yet work for international
+ */
+concept Address {
+  o String addr1 
+  o String addr2 optional
+  o String addr3 optional
+  o String city 
+  o String county optional
+  o String state 
+  o String postcode
+  o Country country // is there a way to default this?
+}
+
+enum PhoneType {
+  o HOME_PHONE
+  o WORK_PHONE
+  o MOBILE_PHONE
+  o TEXT
+  o PAGER
+  o OTHER  
+}
+
+/**
+ * Phone concept
+ */
+ concept Phone {
+   o String number
+   o PhoneType phoneType
+   o String otherType optional
+ }
+
+ enum ElectronicAddressType {
+  o EMAIL
+  o URL
+}
+
+/**
+ * The modern address
+ */
+concept ElectronicAddress {
+  o ElectronicAddressType electronicAddressType 
+  o String emailAddress optional
+  o String URL optional
+}
+
+/**
+ * Languages
+ */
+enum LanguageCode {
+  o EN_US
+  o EN_UK
+}
+
+/**
+ * A native language
+ **/
+concept Language {
+  o LanguageCode languageCode
+  o String englishName
+  o String localName
+}
+
+
+
+/**
+ * Health care is global
+ */
+concept Locale {
+}
+
+enum TimeZone {
+  o UTC
+  o UTC_1
+  o UTC_2
+  o UTC_3
+  o UTC_4
+}
+
+/**
+ * Like java please
+ */
+concept Calendar {
+  o Locale locale
+  o TimeZone timezone
+}

@@ -3,7 +3,10 @@
  */
 namespace org.acme.claim
 
-import org.acme.common.*
+import org.acme.common.Address
+import org.acme.common.Phone
+import org.acme.common.ElectronicAddress
+
 
 /**
  * The state of the adjudicated claim
@@ -48,36 +51,6 @@ concept Name {
   o String nickName optional
   o String suffix optional
 }
-
-/**
- * A US address type 
- */
-concept Address {
-  o String addr1 
-  o String addr2 optional
-  o String city 
-  o String state 
-  o String postcode
-  o String country default = 'US'
-}
-
-enum PhoneType {
-  o HOME_PHONE
-  o WORK_PHONE
-  o MOBILE_PHONE
-  o TEXT
-  o PAGER
-  o OTHER  
-}
-
-/**
- * Phone concept
- */
- concept Phone {
-   o String number
-   o PhoneType phoneType
-   o String otherType optional
- }
 
 /** 
  * Blob types - for attachments 
@@ -338,17 +311,6 @@ asset AdjudicatedDentalClaim extends DentalClaim {
   --> SubmittedDentalClaim submittedDentalClaim
 }
 
-enum CommunicationMethod {
-  o EMAIL
-  o URL
-}
-
-concept ElectronicCommunication {
-  o CommunicationMethod communicationMethod 
-  o String emailAddress optional
-  o String URL optional
-}
-
 /**
  * Change to an member
  */
@@ -356,7 +318,7 @@ asset MemberChange identified by memberChangeId {
   o String memberChangeId
   o Name newName optional  
   o String newSocialSecurityNumber optional
-  o ElectronicCommunication[] newElectronicCommunications optional 
+  o ElectronicAddress[] newElectronicAddresses optional 
   o Phone[] newPhones optional 
   o Address newMemberAddress optional 
   o Period changePeriod optional // ?
@@ -394,7 +356,7 @@ asset MemberAddition identified by memberAdditionId {
   o Address address
   o String socialSecurityNumber optional // is there any tax reporting we need this for?
   o DateTime dateOfBirth 
-  o ElectronicCommunication[] electronicCommunications
+  o ElectronicAddress[] electronicAddresses
   o Phone[] phones
   o Boolean handicapped default = false
   // Reasons for the add TODO verify these are all reasons for an add 
@@ -450,7 +412,17 @@ asset MemberDelete identified by MemberDeleteId {
 abstract asset OrganizationalEntity identified by organizationalEntityId {
   o String organizationalEntityId
   o String name
-  o Address address
+  o String displayName optional
+  o Address address optional
+  o Integer eligible default=0 
+  o Integer enrolled default=0
+  o DateTime lastEnroll
+  o DateTime reconciliation optional
+  o DateTime spanEnd optional 
+  o DateTime businessNetworkEnd optional 
+  o DateTime statusEnd optional
+  o Boolean continueCoverage default=false
+  o DateTime renewal optional
 }
 
 /**
@@ -458,6 +430,13 @@ abstract asset OrganizationalEntity identified by organizationalEntityId {
  */
 asset Group extends OrganizationalEntity {
   --> Division[] divisions optional 
+  o String typeCode optional 
+  o String nationalAccountPrefix optional
+  o String nationalAccountIdentifier optional 
+  o String standardIndustryCode optional
+  o String natonalEmployerIdentifier optional 
+  o Boolean approval default=true 
+  o Boolean audit default=true 
 }
 
 /**
@@ -624,7 +603,7 @@ participant Person identified by personId {
   o String personalIdentifier optional
   o Name name 
   o Address address optional
-  o ElectronicCommunication[] electronicCommunications optional
+  o ElectronicAddress[] electronicAddresses optional
   o Phone[] phones optional 
   o Gender gender
   o DateTime dateOfBirth 
