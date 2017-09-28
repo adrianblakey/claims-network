@@ -274,10 +274,16 @@ asset DentalPlan identified by dentalPlanId {
 }
 
 /**
- * Abstract claim supertype
+ * Supertype of all claims
  */
-abstract asset DentalClaim identified by dentalClaimId {
-  o String dentalClaimId
+abstract asset Claim identified by claimId {
+  o String claimId
+}
+
+/**
+ * Abstract supertype of all Dental claims
+ */
+abstract asset DentalClaim extends Claim {
   o DentalClaimType dentalClaimType
 }
 
@@ -373,7 +379,16 @@ asset SubmittedDentalServiceLine identified by dentalServiceLineId {
     o String diagPointer
     o Integer quantity
     o String description optional
-    o BigDecimal fee
+    o BigDecimal fee optional
+}
+
+/**
+ * The adjudicated claim - the claim as it's processed 
+ */
+asset AdjudicatedDentalClaim extends DentalClaim {
+  o ClaimStatus claimStatus
+  o Double amount
+  --> SubmittedDentalClaim submittedDentalClaim
 }
 
 /**
@@ -389,17 +404,11 @@ asset AdjudicatedDentalServiceLine extends SubmittedDentalServiceLine {
   o Double copaymentAmount
   o Double deductibleAmount
   o Double paidAmount
-}
-
-// The adjudicated claim - as it's processed 
-asset AdjudicatedDentalClaim extends DentalClaim {
-  o ClaimStatus claimStatus
-  o Double amount
-  --> SubmittedDentalClaim submittedDentalClaim
+  --> SubmittedDentalServiceLine submittedDentalServiceLine 
 }
 
 /**
- * Change to an member
+ * Change to an member - MEMBERSHIP
  */
 asset MemberChange identified by memberChangeId {
   o String memberChangeId
@@ -419,6 +428,9 @@ asset MemberChange identified by memberChangeId {
   o Address address optional 
 }
 
+/**
+ * MEMBERSHIP
+ */
 asset MemberAdditions identified by memberAdditionsId {
   o String memberAdditionsId
   o MemberHeader header
@@ -428,6 +440,7 @@ asset MemberAdditions identified by memberAdditionsId {
 /**
  * Enroll a subscriber - someone directly insured
  * Enroll a member - dependent of a subscriber
+ * MEMBERSHIP
  */
 asset MemberAddition identified by memberAdditionId {
   o String memberAdditionId
@@ -460,18 +473,24 @@ asset MemberAddition identified by memberAdditionId {
   o String dateTimePeriodDescription optional
 }
 
+/**
+ * MEMBERSHIP
+ */
 asset SubscriberAddition extends MemberAddition {
   o String employeeIdNumber optional
   o DateTime employmentBeginDate optional
 }
 
+/**
+ * MEMBERSHIP
+ */
 asset DependentAddition extends SubscriberAddition {
   o RelationshipToSubscriber relationshipToSubscriber 
   --> SubscriberAddition subscriberAddition
 }
 
 /**
- * Delete one or more Members 
+ * Delete one or more Members MEMBERSHIP
  */
 asset MemberDeletions identified by MemberDeletionsId {
   o String MemberDeletionsId
@@ -480,6 +499,7 @@ asset MemberDeletions identified by MemberDeletionsId {
 }
 
 /**
+ * MEMBERSHIP
  * Member identifiers to delete, remove an 
  * erroneous add - todo ordering to undo a graph? members before subscriber
  */
@@ -494,6 +514,7 @@ asset MemberDelete identified by MemberDeleteId {
 }
 
 /**
+ 8 MEMBERSHIP
  * Organizational groupings
  */
 abstract asset OrganizationalEntity identified by organizationalEntityId {
@@ -513,6 +534,7 @@ abstract asset OrganizationalEntity identified by organizationalEntityId {
 }
 
 /**
+ * MEMBERSHIP
  * Group
  */
 asset Group extends OrganizationalEntity {
@@ -527,6 +549,7 @@ asset Group extends OrganizationalEntity {
 }
 
 /**
+ * MEMBERSHIP
  * Division
  */
 asset Division extends OrganizationalEntity {
@@ -534,6 +557,7 @@ asset Division extends OrganizationalEntity {
 }
 
 /**
+ 8 MEMBERSHIP
  * Needed to identify every Member CRUD
  */
 concept MemberHeader {
@@ -552,6 +576,7 @@ concept MemberHeader {
 }
 
 /**
+ * MEMBERSHIP
  * Benefit package hierarchy.
  * Four levesl in the hierachy:
  * BenefitPackage
@@ -666,23 +691,26 @@ asset Payment identified by paymentId {
 }
 
 /**
+ * PROVIDER
  * A human provider 
  */
-participant Provider identified by npi {
+participant HumanProvider identified by npi {
   o String npi
   o HumanName name
 }
 
 /**
+ * PROVIDER
  * A provider who can submit a claim and receives payment for it
  */
-participant BillingProvider extends Provider {
+participant BillingProvider extends HumanProvider {
   o String tin
   --> SubmittedDentalClaim[] submittedDentalClaims optional
   --> Payment[] payments optional 
 }
 
 /**
+ * MEMBERSHIP - MIGHT BE COMMON
  * A basic person
  */
 participant Person identified by personId {
@@ -709,12 +737,14 @@ participant Person identified by personId {
 }
 
 /**
+ * CAIM - maybe
  * Someone who is eligible for services by being enrolled in an insurance plan, AKA member
  */
 participant Member extends Person {
 }
 
 /**
+ * CLAIM
  * A person who is enrolled in an insurance plan. AKA PolicyHolder
  */
 participant Subscriber extends Member {

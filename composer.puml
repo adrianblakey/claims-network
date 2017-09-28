@@ -1,0 +1,1396 @@
+@startuml
+'** Auto generated content, any changes may be lost **'
+!define DATE %date[EEE, MMM d, ''yy 'at' HH:mm]%
+skinparam titleBorderThickness 0.5
+skinparam titleBorderRoundCorner 6
+skinparam titleBackgroundColor LightYellow
+title
+Business Network Definition for 'claims.cto'
+end title
+class org.acme.common.TwoCharCountryCode << (E,grey) >> {
+   + US
+   + UK
+}
+class org.acme.common.ThreeCharCountryCode << (E,grey) >> {
+   + USA
+   + UKE
+}
+class org.acme.common.Country {
+   + TwoCharCountryCode twoCharCountryCode
+   + ThreeCharCountryCode threeCharCountryCode
+}
+class org.acme.common.Address {
+   + String addr1
+   + String addr2
+   + String addr3
+   + String city
+   + String county
+   + String state
+   + String postcode
+   + Country country
+}
+class org.acme.common.PhoneType << (E,grey) >> {
+   + HOME_PHONE
+   + WORK_PHONE
+   + MOBILE_PHONE
+   + TEXT
+   + PAGER
+   + OTHER
+}
+class org.acme.common.Phone {
+   + String number
+   + PhoneType phoneType
+   + String otherType
+}
+class org.acme.common.ElectronicAddressType << (E,grey) >> {
+   + EMAIL
+   + URL
+}
+class org.acme.common.ElectronicAddress {
+   + ElectronicAddressType electronicAddressType
+   + String emailAddress
+   + String URL
+}
+class org.acme.common.LanguageCode << (E,grey) >> {
+   + EN_US
+   + EN_UK
+}
+class org.acme.common.Language {
+   + LanguageCode languageCode
+   + String englishName
+   + String localName
+}
+class org.acme.common.Locale {
+}
+class org.acme.common.TimeZone << (E,grey) >> {
+   + UTC
+   + UTC_1
+   + UTC_2
+   + UTC_3
+   + UTC_4
+   + UTCPLUS1
+}
+class org.acme.common.Calendar {
+   + Locale locale
+   + TimeZone timezone
+}
+class org.acme.common.Title << (E,grey) >> {
+   + Mr
+   + Mrs
+   + Ms
+   + Mx
+   + Miss
+   + Master
+}
+class org.acme.common.HumanName {
+   + Title title
+   + String prefix
+   + String firstName
+   + String middleName
+   + String lastName
+   + String displayName
+   + String nickName
+   + String suffix
+}
+class org.acme.common.Blob {
+   + String contents
+}
+class org.acme.common.JPEG {
+   + String mimeType
+}
+org.acme.common.JPEG --|> org.acme.common.Blob
+class org.acme.common.TIFF {
+   + String mimeType
+}
+org.acme.common.TIFF --|> org.acme.common.Blob
+class org.acme.common.BigDecimal {
+   + Integer integerPart
+   + Integer fractionPart
+}
+class org.acme.common.Period {
+   + DateTime from
+   + DateTime to
+}
+class org.acme.provider.ProviderRole << (E,grey) >> {
+   + FACILITY
+   + RENDERING_PROVIDER
+   + BILLING_PROVIDER
+   + OFFICE_MANAGER
+   + LEGAL
+   + ADMINISTRATION
+}
+class org.acme.provider.Provider << (P,lightblue) >> {
+   + String providerId
+}
+org.acme.provider.Provider --|> org.hyperledger.composer.system.Participant
+class org.acme.provider.BillingProvider << (P,lightblue) >> {
+}
+org.acme.provider.BillingProvider --|> org.acme.provider.Provider
+class org.acme.provider.OfficeManager << (P,lightblue) >> {
+   + String officeManagerId
+}
+org.acme.provider.OfficeManager --|> org.hyperledger.composer.system.Participant
+class org.acme.provider.Legal << (P,lightblue) >> {
+   + String legalId
+}
+org.acme.provider.Legal --|> org.hyperledger.composer.system.Participant
+class org.acme.provider.Administrator << (P,lightblue) >> {
+   + String administratorId
+}
+org.acme.provider.Administrator --|> org.hyperledger.composer.system.Participant
+class org.acme.provider.ProviderOrganization << (A,green) >> {
+   + String providerOrganizationId
+   + String name
+   + Address address
+   + ElectronicAddress electronicAddress
+   + Facility[] facilities
+}
+org.acme.provider.ProviderOrganization --|> org.hyperledger.composer.system.Asset
+class org.acme.provider.OpenTime {
+   + String dayOfweek
+   + String startTime
+   + String endTime
+}
+class org.acme.provider.Facility << (A,green) >> {
+   + String facilityId
+   + Address address
+   + Phone phone
+   + ElectronicAddress electronicAddress
+   + OpenTime[] openTimes
+}
+org.acme.provider.Facility --|> org.hyperledger.composer.system.Asset
+class org.acme.provider.BankAccount << (A,green) >> {
+   + String bankAccountId
+}
+org.acme.provider.BankAccount --|> org.hyperledger.composer.system.Asset
+class org.acme.provider.BusinessPracticeOrganization << (A,green) >> {
+   + GroupPractice[] groupPractices
+   + BankAccount bankAccountForPayments
+}
+org.acme.provider.BusinessPracticeOrganization --|> org.acme.provider.ProviderOrganization
+class org.acme.provider.GroupPractice << (A,green) >> {
+   + String groupPracticeId
+   + BankAccount bankAccount
+   + BusinessPracticeOrganization businessPracticeOrganization
+   + RenderingProvider[] renderingProviders
+}
+org.acme.provider.GroupPractice --|> org.acme.provider.ProviderOrganization
+class org.acme.provider.RenderingProvider << (P,lightblue) >> {
+   + SpecialtyLicense primarySpecialtyLicense
+   + SpecialtyLicense[] additionalSpecialtyLicenses
+}
+org.acme.provider.RenderingProvider --|> org.acme.provider.Provider
+class org.acme.provider.Specialty << (A,green) >> {
+   + String specialtyId
+}
+org.acme.provider.Specialty --|> org.hyperledger.composer.system.Asset
+class org.acme.provider.License << (A,green) >> {
+   + String licenseId
+}
+org.acme.provider.License --|> org.hyperledger.composer.system.Asset
+class org.acme.provider.SpecialtyLicense << (A,green) >> {
+   + String specialtyLicenseId
+   + Specialty specialty
+   + License license
+}
+org.acme.provider.SpecialtyLicense --|> org.hyperledger.composer.system.Asset
+class org.acme.provider.ProviderGroupPracticeAffiliation << (A,green) >> {
+   + String providerGroupPracticeAffiliationId
+   + Provider provider
+   + GroupPractice groupPractice
+}
+org.acme.provider.ProviderGroupPracticeAffiliation --|> org.hyperledger.composer.system.Asset
+class org.acme.provider.Network << (A,green) >> {
+   + String networkId
+}
+org.acme.provider.Network --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.Address {
+   + String addr1
+   + String addr2
+   + String addr3
+   + String city
+   + String county
+   + String state
+   + String postcode
+   + String country
+}
+class org.acme.claim.PhoneType << (E,grey) >> {
+   + HOME_PHONE
+   + WORK_PHONE
+   + MOBILE_PHONE
+   + TEXT
+   + PAGER
+   + OTHER
+}
+class org.acme.claim.Phone {
+   + String number
+   + PhoneType phoneType
+   + String otherType
+}
+class org.acme.claim.ElectronicAddressType << (E,grey) >> {
+   + EMAIL
+   + URL
+}
+class org.acme.claim.ElectronicAddress {
+   + ElectronicAddressType electronicAddressType
+   + String emailAddress
+   + String URL
+}
+class org.acme.claim.LanguageCode << (E,grey) >> {
+   + EN_US
+   + EN_UK
+}
+class org.acme.claim.Language {
+   + LanguageCode languageCode
+   + String englishName
+   + String localName
+}
+class org.acme.claim.Locale {
+}
+class org.acme.claim.TimeZone << (E,grey) >> {
+   + UTC
+   + UTC_1
+   + UTC_2
+   + UTC_3
+   + UTC_4
+   + UTCPLUS1
+}
+class org.acme.claim.Calendar {
+   + Locale locale
+   + TimeZone timezone
+}
+class org.acme.claim.Title << (E,grey) >> {
+   + Mr
+   + Mrs
+   + Ms
+   + Mx
+   + Miss
+   + Master
+}
+class org.acme.claim.HumanName {
+   + Title title
+   + String prefix
+   + String firstName
+   + String middleName
+   + String lastName
+   + String displayName
+   + String nickName
+   + String suffix
+}
+class org.acme.claim.Blob {
+   + String contents
+}
+class org.acme.claim.JPEG {
+   + String mimeType
+}
+org.acme.claim.JPEG --|> org.acme.claim.Blob
+class org.acme.claim.TIFF {
+   + String mimeType
+}
+org.acme.claim.TIFF --|> org.acme.claim.Blob
+class org.acme.claim.BigDecimal {
+   + Integer integerPart
+   + Integer fractionPart
+}
+class org.acme.claim.Period {
+   + DateTime from
+   + DateTime to
+}
+class org.acme.claim.ClaimStatus << (E,grey) >> {
+   + HELD
+   + PAID
+}
+class org.acme.claim.DentalClaimType << (E,grey) >> {
+   + PRED
+   + ENCOUNTER
+   + EPSDT
+   + GENERATED
+}
+class org.acme.claim.PatientsRelationshipToPolicyHolder << (E,grey) >> {
+   + SELF
+   + SPOUSE
+   + DEPENDENT
+   + OTHER
+}
+class org.acme.claim.RelationshipToSubscriber << (E,grey) >> {
+   + SPOUSE
+   + ADOPTED_CHILD
+   + FOSTER_CHILD
+   + WARD
+   + STEP_CHILD
+   + SELF
+   + CHILD
+   + SPONSORED_DEPENDENT
+   + EX_SPOUSE
+   + LIFE_PARTNER
+}
+class org.acme.claim.BenefitStatus << (E,grey) >> {
+   + ACTIVE
+   + COBRA
+}
+class org.acme.claim.Gender << (E,grey) >> {
+   + MALE
+   + FEMALE
+   + OTHER
+}
+class org.acme.claim.CobraQualifyingEvent << (E,grey) >> {
+   + TERMINATION
+   + REDUCTION_OF_HOURS
+   + MEDICARE
+   + DEATH
+   + DIVORCE
+   + SEPARATION
+   + INELIGIBLE_CHILD
+   + BANKRUPTCY_OF_RETIRED_EMPLOYEE_EMPLOYER
+   + LAYOFF
+   + LEAVE_OF_ABSENCE
+}
+class org.acme.claim.EmploymentStatus << (E,grey) >> {
+   + ACTIVE_MILITARY_OVERSEAS
+   + ACTIVE_MILITARY_USA
+   + FULL_TIME_ACTIVE_EMPLOYEE
+   + LEAVE_OF_ABSENCE
+   + PART_TIME_ACTIVE_EMPLOYEE
+   + RETIRED
+   + TERMINATED
+}
+class org.acme.claim.StudentStatus << (E,grey) >> {
+   + FULL_TIME
+   + NOT_A_STUDENT
+   + PART_TIME
+}
+class org.acme.claim.DiagnosisCodeListQualifier << (E,grey) >> {
+   + ICD9
+   + ICD10
+}
+class org.acme.claim.TreatmentResultingFrom << (E,grey) >> {
+   + OCCUPATIONAL_ILLNESS
+   + AUTO_ACCIDENT
+   + OTHER
+}
+class org.acme.claim.DentalSubmittedOtherCoverage {
+   + HumanName nameOfPolicyHolder
+   + DateTime dateOfBirth
+   + Gender gender
+   + String memberId
+   + String socialSecurityNumber
+   + String planOrGroupNumber
+   + PatientsRelationshipToPolicyHolder patientsRelationshipToPolicyHolder
+   + String planName
+   + Address planAddress
+}
+class org.acme.claim.DentalPlan << (A,green) >> {
+   + String dentalPlanId
+   + String name
+   + Address address
+}
+org.acme.claim.DentalPlan --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.DentalClaim << (A,green) >> {
+   + String dentalClaimId
+   + DentalClaimType dentalClaimType
+}
+org.acme.claim.DentalClaim --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.DentalClaimAttachment << (A,green) >> {
+   + String dentalClaimAttachmentId
+   + Blob blob
+}
+org.acme.claim.DentalClaimAttachment --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.SubmittedDentalClaim << (A,green) >> {
+   + String predeterminationClaimId
+   + String planName
+   + Address planAddress
+   + DentalSubmittedOtherCoverage dentalSubmittedOtherCoverage
+   + HumanName memberName
+   + Address memberAddress
+   + DateTime memberDateOfBirth
+   + Gender memberGender
+   + String memberId
+   + String planOrGroupNumber
+   + String employerName
+   + PatientsRelationshipToPolicyHolder patientsRelationshipToPolicyHolder
+   + HumanName patientName
+   + Address patientAddress
+   + DateTime patientDateOfBirth
+   + Gender patientGender
+   + String dentistPatientId
+   + SubmittedDentalServiceLine[] submittedDentalServiceLines
+   + BigDecimal otherFees
+   + BigDecimal totalFees
+   + Double amount
+   + String missingTeeth
+   + DiagnosisCodeListQualifier diagnosisCodeListQualifier
+   + String diagnosisCodeA
+   + String diagnosisCodeB
+   + String diagnosisCodeC
+   + String diagnosisCodeD
+   + String remarks
+   + Boolean patientGuardianSignature
+   + Boolean subscriberSignature
+   + Integer placeOfTreatmentCode
+   + DentalClaimAttachment[] dentalClaimAttachments
+   + DateTime appliancePlaced
+   + Integer monthsOfTreatment
+   + DateTime priorPlacement
+   + TreatmentResultingFrom treatmentResultingFrom
+   + DateTime dateOfAccident
+   + String autoAccidentState
+   + HumanName billingProviderName
+   + Address billingProviderAddress
+   + String billingProviderNpi
+   + String billingProviderLicense
+   + String billingProviderTin
+   + String billingProviderPhoneNumber
+   + String billingProviderAddlId
+   + HumanName treatingProviderName
+   + String treatingProviderNpi
+   + String treatingProviderLicense
+   + Address treatingProviderAddress
+   + String treatingProviderSpecialtyCode
+   + String treatingProviderPhoneNumber
+   + String treatingProviderAddlId
+}
+org.acme.claim.SubmittedDentalClaim --|> org.acme.claim.DentalClaim
+class org.acme.claim.SubmittedDentalServiceLine << (A,green) >> {
+   + String dentalServiceLineId
+   + Integer lineNumber
+   + DateTime procedureDate
+   + String areaOfOralCavity
+   + String toothSystem
+   + String toothNumberOrLetter
+   + String toothSurface
+   + String procedureCode
+   + String diagPointer
+   + Integer quantity
+   + String description
+   + BigDecimal fee
+}
+org.acme.claim.SubmittedDentalServiceLine --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.AdjudicatedDentalServiceLine << (A,green) >> {
+   + Integer lineNumberx
+   + String procedureCodex
+   + Double chargeAmount
+   + Double approvedAmount
+   + Double allowedAmount
+   + Double deniedAmount
+   + Double copaymentAmount
+   + Double deductibleAmount
+   + Double paidAmount
+}
+org.acme.claim.AdjudicatedDentalServiceLine --|> org.acme.claim.SubmittedDentalServiceLine
+class org.acme.claim.AdjudicatedDentalClaim << (A,green) >> {
+   + ClaimStatus claimStatus
+   + Double amount
+   + SubmittedDentalClaim submittedDentalClaim
+}
+org.acme.claim.AdjudicatedDentalClaim --|> org.acme.claim.DentalClaim
+class org.acme.claim.MemberChange << (A,green) >> {
+   + String memberChangeId
+   + HumanName newName
+   + String newSocialSecurityNumber
+   + ElectronicAddress[] newElectronicAddresses
+   + Phone[] newPhones
+   + Address newMemberAddress
+   + Period changePeriod
+   + Gender newGender
+   + String memberId
+   + HumanName memberName
+   + String socialSecurityNumber
+   + DateTime birthDate
+   + Gender gender
+   + Address address
+}
+org.acme.claim.MemberChange --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.MemberAdditions << (A,green) >> {
+   + String memberAdditionsId
+   + MemberHeader header
+   + MemberAddition[] memberAdditions
+}
+org.acme.claim.MemberAdditions --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.MemberAddition << (A,green) >> {
+   + String memberAdditionId
+   + HumanName name
+   + Gender gender
+   + Address address
+   + String socialSecurityNumber
+   + DateTime dateOfBirth
+   + ElectronicAddress[] electronicAddresses
+   + Phone[] phones
+   + Boolean handicapped
+   + BenefitStatus benefitStatus
+   + CobraQualifyingEvent cobraQualifyingEvent
+   + EmploymentStatus employmentStatus
+   + StudentStatus studentStatus
+   + DateTime deathOfSubscriberOrDependent
+   + DateTime educationBeginDate
+   + DateTime eligibilityEndDate
+   + String dateTimePeriodDescription
+}
+org.acme.claim.MemberAddition --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.SubscriberAddition << (A,green) >> {
+   + String employeeIdNumber
+   + DateTime employmentBeginDate
+}
+org.acme.claim.SubscriberAddition --|> org.acme.claim.MemberAddition
+class org.acme.claim.DependentAddition << (A,green) >> {
+   + RelationshipToSubscriber relationshipToSubscriber
+   + SubscriberAddition subscriberAddition
+}
+org.acme.claim.DependentAddition --|> org.acme.claim.SubscriberAddition
+class org.acme.claim.MemberDeletions << (A,green) >> {
+   + String MemberDeletionsId
+   + MemberHeader header
+   + MemberDelete[] MemberDeletions
+}
+org.acme.claim.MemberDeletions --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.MemberDelete << (A,green) >> {
+   + String MemberDeleteId
+   + String identifier
+   + String socialSecurityNumber
+   + HumanName name
+   + DateTime dateOfBirth
+}
+org.acme.claim.MemberDelete --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.OrganizationalEntity << (A,green) >> {
+   + String organizationalEntityId
+   + String name
+   + String displayName
+   + Address address
+   + Integer eligible
+   + Integer enrolled
+   + DateTime lastEnroll
+   + DateTime reconciliation
+   + DateTime spanEnd
+   + DateTime businessNetworkEnd
+   + DateTime statusEnd
+   + Boolean continueCoverage
+   + DateTime renewal
+}
+org.acme.claim.OrganizationalEntity --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.Group << (A,green) >> {
+   + Division[] divisions
+   + String typeCode
+   + String nationalAccountPrefix
+   + String nationalAccountIdentifier
+   + String standardIndustryCode
+   + String natonalEmployerIdentifier
+   + Boolean approval
+   + Boolean audit
+}
+org.acme.claim.Group --|> org.acme.claim.OrganizationalEntity
+class org.acme.claim.Division << (A,green) >> {
+   + Group group
+}
+org.acme.claim.Division --|> org.acme.claim.OrganizationalEntity
+class org.acme.claim.MemberHeader {
+   + String payerNumber
+   + String payerName
+   + String groupNumber
+   + String groupName
+   + String groupTaxPayerIdNumber
+   + String divisionNumber
+   + String brokerNumber
+   + String brokerName
+   + String brokerTaxPayerIdNumber
+}
+class org.acme.claim.Benefit << (A,green) >> {
+   + String benefitId
+   + BenefitConstraint[] benefitConstraints
+}
+org.acme.claim.Benefit --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.BenefitConstraint << (A,green) >> {
+   + String benefitConstraintsId
+   + String description
+   + String applyTo
+}
+org.acme.claim.BenefitConstraint --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.Limit << (A,green) >> {
+   + BigDecimal limit
+}
+org.acme.claim.Limit --|> org.acme.claim.BenefitConstraint
+class org.acme.claim.Deductible << (A,green) >> {
+   + BigDecimal deductible
+}
+org.acme.claim.Deductible --|> org.acme.claim.BenefitConstraint
+class org.acme.claim.Copayment << (A,green) >> {
+   + BigDecimal copayment
+}
+org.acme.claim.Copayment --|> org.acme.claim.BenefitConstraint
+class org.acme.claim.BenefitPackage << (A,green) >> {
+   + Counter[] counters
+   + Coverage[] coverages
+}
+org.acme.claim.BenefitPackage --|> org.acme.claim.Benefit
+class org.acme.claim.CoverageType << (E,grey) >> {
+   + VISION
+   + DENTAL
+   + PSYCHIATRIC
+   + HEALTH
+}
+class org.acme.claim.Coverage << (A,green) >> {
+   + CoverageType coverageType
+   + BenefitPackage benefitPackage
+   + CoverageComponent[] coverageComponents
+}
+org.acme.claim.Coverage --|> org.acme.claim.Benefit
+class org.acme.claim.CoverageComponent << (A,green) >> {
+   + String description
+   + Coverage coverage
+   + CoverageDetail[] coverageDetails
+}
+org.acme.claim.CoverageComponent --|> org.acme.claim.Benefit
+class org.acme.claim.CoverageDetail << (A,green) >> {
+   + CoverageComponent converageComponent
+}
+org.acme.claim.CoverageDetail --|> org.acme.claim.Benefit
+class org.acme.claim.CoverageDetailNonPar << (A,green) >> {
+}
+org.acme.claim.CoverageDetailNonPar --|> org.acme.claim.CoverageDetail
+class org.acme.claim.CoverageDetailPar << (A,green) >> {
+}
+org.acme.claim.CoverageDetailPar --|> org.acme.claim.CoverageDetail
+class org.acme.claim.ServiceCode << (A,green) >> {
+   + String serviceCodeId
+}
+org.acme.claim.ServiceCode --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.Counter << (A,green) >> {
+   + String counterId
+   + String description
+   + String[] tags
+}
+org.acme.claim.Counter --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.MonetaryCounter << (A,green) >> {
+   + BigDecimal counter
+}
+org.acme.claim.MonetaryCounter --|> org.acme.claim.Counter
+class org.acme.claim.ServiceCounter << (A,green) >> {
+   + ServiceCode ServiceCode
+   + Integer counter
+}
+org.acme.claim.ServiceCounter --|> org.acme.claim.Counter
+class org.acme.claim.VisitCounter << (A,green) >> {
+   + Integer visits
+}
+org.acme.claim.VisitCounter --|> org.acme.claim.Counter
+class org.acme.claim.Payment << (A,green) >> {
+   + String paymentId
+   + Double amount
+   + AdjudicatedDentalClaim adjudicatedDentalClaim
+   + BillingProvider billingProvider
+}
+org.acme.claim.Payment --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.Provider << (P,lightblue) >> {
+   + String npi
+   + HumanName name
+}
+org.acme.claim.Provider --|> org.hyperledger.composer.system.Participant
+class org.acme.claim.BillingProvider << (P,lightblue) >> {
+   + String tin
+   + SubmittedDentalClaim[] submittedDentalClaims
+   + Payment[] payments
+}
+org.acme.claim.BillingProvider --|> org.acme.claim.Provider
+class org.acme.claim.Person << (P,lightblue) >> {
+   + String personId
+   + String personalIdentifier
+   + HumanName name
+   + Address address
+   + ElectronicAddress[] electronicAddresses
+   + Phone[] phones
+   + Gender gender
+   + DateTime dateOfBirth
+   + DateTime deathDate
+   + DateTime deathNotificationDate
+   + String causeOfDeath
+   + String socialSecurityNumber
+   + Boolean directiveOnFile
+   + String desiredCommunicationMethod
+   + String maritalStatus
+   + String languageCode
+   + Boolean medicalNoPriorCoverage
+   + Boolean dentalNoPriorCoverage
+   + String ethnicity
+   + String race
+}
+org.acme.claim.Person --|> org.hyperledger.composer.system.Participant
+class org.acme.claim.Member << (P,lightblue) >> {
+}
+org.acme.claim.Member --|> org.acme.claim.Person
+class org.acme.claim.Subscriber << (P,lightblue) >> {
+   + String employer
+   + Dependent[] dependents
+   + SubscriberPlan[] subscriberPlans
+}
+org.acme.claim.Subscriber --|> org.acme.claim.Member
+class org.acme.claim.MemberPlan << (A,green) >> {
+   + String memberPlanId
+   + Counter[] counters
+}
+org.acme.claim.MemberPlan --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.SubscriberPlan << (A,green) >> {
+   + String subscriberPlanId
+   + Subscriber subscriber
+   + DentalPlan dentalPlan
+   + DateTime effectiveDate
+   + DateTime terminationDate
+   + Dependent[] dependents
+}
+org.acme.claim.SubscriberPlan --|> org.hyperledger.composer.system.Asset
+class org.acme.claim.Dependent << (P,lightblue) >> {
+   + RelationshipToSubscriber relationshipToSubscriber
+   + Subscriber subscriber
+}
+org.acme.claim.Dependent --|> org.acme.claim.Member
+class org.acme.claim.CreatePlan << (T,yellow) >> {
+}
+org.acme.claim.CreatePlan --|> org.hyperledger.composer.system.Transaction
+class org.acme.claim.CreateGroup << (T,yellow) >> {
+}
+org.acme.claim.CreateGroup --|> org.hyperledger.composer.system.Transaction
+class org.acme.claim.CreateSubscriber << (T,yellow) >> {
+}
+org.acme.claim.CreateSubscriber --|> org.hyperledger.composer.system.Transaction
+class org.acme.claim.CreateBillingProvider << (T,yellow) >> {
+}
+org.acme.claim.CreateBillingProvider --|> org.hyperledger.composer.system.Transaction
+class org.acme.claim.AdjudicateDentalClaim << (T,yellow) >> {
+   + SubmittedDentalClaim submittedDentalClaim
+}
+org.acme.claim.AdjudicateDentalClaim --|> org.hyperledger.composer.system.Transaction
+class org.acme.claim.PayDentalClaim << (T,yellow) >> {
+   + AdjudicatedDentalClaim adjudicatedDentalClaim
+}
+org.acme.claim.PayDentalClaim --|> org.hyperledger.composer.system.Transaction
+class org.acme.claim.CreateSubmittedClaim << (T,yellow) >> {
+}
+org.acme.claim.CreateSubmittedClaim --|> org.hyperledger.composer.system.Transaction
+class org.acme.claim.PostTransaction << (T,yellow) >> {
+   + SubmittedDentalClaim submittedDentalClaim
+}
+org.acme.claim.PostTransaction --|> org.hyperledger.composer.system.Transaction
+class org.acme.claim.AddMembers << (T,yellow) >> {
+   + MemberAdditions MemberAdditions
+}
+org.acme.claim.AddMembers --|> org.hyperledger.composer.system.Transaction
+class org.acme.claim.DeleteMembers << (T,yellow) >> {
+   + MemberDeletions MemberDeletions
+}
+org.acme.claim.DeleteMembers --|> org.hyperledger.composer.system.Transaction
+class org.acme.claim.ChangeMember << (T,yellow) >> {
+}
+org.acme.claim.ChangeMember --|> org.hyperledger.composer.system.Transaction
+class org.acme.claim.CancellMember << (T,yellow) >> {
+}
+org.acme.claim.CancellMember --|> org.hyperledger.composer.system.Transaction
+class org.acme.claim.ReinstateMember << (T,yellow) >> {
+}
+org.acme.claim.ReinstateMember --|> org.hyperledger.composer.system.Transaction
+class org.acme.claim.CorrectMember << (T,yellow) >> {
+}
+org.acme.claim.CorrectMember --|> org.hyperledger.composer.system.Transaction
+class org.acme.claim.AuditMember << (T,yellow) >> {
+}
+org.acme.claim.AuditMember --|> org.hyperledger.composer.system.Transaction
+class org.acme.claim.InformationMember << (T,yellow) >> {
+}
+org.acme.claim.InformationMember --|> org.hyperledger.composer.system.Transaction
+class org.acme.claim.StartAdjudicationEvent {
+   + AdjudicatedDentalClaim adjudicatedDentalClaim
+   + SubmittedDentalClaim submittedDentalClaim
+}
+org.acme.claim.StartAdjudicationEvent --|> org.hyperledger.composer.system.Event
+class org.acme.claim.PayDentalClaimEvent {
+   + AdjudicatedDentalClaim adjudicatedDentalClaim
+   + Payment payment
+}
+org.acme.claim.PayDentalClaimEvent --|> org.hyperledger.composer.system.Event
+class org.acme.membership.BenefitStatus << (E,grey) >> {
+   + ACTIVE
+   + COBRA
+}
+class org.acme.membership.Gender << (E,grey) >> {
+   + MALE
+   + FEMALE
+   + OTHER
+}
+class org.acme.membership.CobraQualifyingEvent << (E,grey) >> {
+   + TERMINATION
+   + REDUCTION_OF_HOURS
+   + MEDICARE
+   + DEATH
+   + DIVORCE
+   + SEPARATION
+   + INELIGIBLE_CHILD
+   + BANKRUPTCY_OF_RETIRED_EMPLOYEE_EMPLOYER
+   + LAYOFF
+   + LEAVE_OF_ABSENCE
+}
+class org.acme.membership.EmploymentStatus << (E,grey) >> {
+   + ACTIVE_MILITARY_OVERSEAS
+   + ACTIVE_MILITARY_USA
+   + FULL_TIME_ACTIVE_EMPLOYEE
+   + LEAVE_OF_ABSENCE
+   + PART_TIME_ACTIVE_EMPLOYEE
+   + RETIRED
+   + TERMINATED
+}
+class org.acme.membership.StudentStatus << (E,grey) >> {
+   + FULL_TIME
+   + NOT_A_STUDENT
+   + PART_TIME
+}
+class org.acme.membership.DiagnosisCodeListQualifier << (E,grey) >> {
+   + ICD9
+   + ICD10
+}
+class org.acme.membership.TreatmentResultingFrom << (E,grey) >> {
+   + OCCUPATIONAL_ILLNESS
+   + AUTO_ACCIDENT
+   + OTHER
+}
+class org.acme.membership.DentalSubmittedOtherCoverage {
+   + Name nameOfPolicyHolder
+   + DateTime dateOfBirth
+   + Gender gender
+   + String enrolleeId
+   + String socialSecurityNumber
+   + String planOrGroupNumber
+   + String planName
+   + Address planAddress
+}
+class org.acme.membership.DentalPlan << (A,green) >> {
+   + String dentalPlanId
+   + String name
+   + Address address
+}
+org.acme.membership.DentalPlan --|> org.hyperledger.composer.system.Asset
+class org.acme.membership.DentalClaim << (A,green) >> {
+   + String dentalClaimId
+}
+org.acme.membership.DentalClaim --|> org.hyperledger.composer.system.Asset
+class org.acme.membership.DentalClaimAttachment << (A,green) >> {
+   + String dentalClaimAttachmentId
+   + Blob blob
+}
+org.acme.membership.DentalClaimAttachment --|> org.hyperledger.composer.system.Asset
+class org.acme.membership.SubmittedDentalClaim << (A,green) >> {
+   + String predeterminationClaimId
+   + String planName
+   + Address planAddress
+   + DentalSubmittedOtherCoverage dentalSubmittedOtherCoverage
+   + Name enrolleeName
+   + Address enrolleeAddress
+   + DateTime enrolleeDateOfBirth
+   + Gender enrolleeGender
+   + String enrolleeId
+   + String planOrGroupNumber
+   + String employerName
+   + Name patientName
+   + Address patientAddress
+   + DateTime patientDateOfBirth
+   + Gender patientGender
+   + String dentistPatientId
+   + SubmittedDentalServiceLine[] submittedDentalServiceLines
+   + BigDecimal otherFees
+   + BigDecimal totalFees
+   + String missingTeeth
+   + DiagnosisCodeListQualifier diagnosisCodeListQualifier
+   + String diagnosisCodeA
+   + String diagnosisCodeB
+   + String diagnosisCodeC
+   + String diagnosisCodeD
+   + String remarks
+   + Boolean patientGuardianSignature
+   + Boolean subscriberSignature
+   + Integer placeOfTreatmentCode
+   + DentalClaimAttachment[] dentalClaimAttachments
+   + DateTime appliancePlaced
+   + Integer monthsOfTreatment
+   + DateTime priorPlacement
+   + TreatmentResultingFrom treatmentResultingFrom
+   + DateTime dateOfAccident
+   + String autoAccidentState
+   + Name billingProviderName
+   + Address billingProviderAddress
+   + String billingProviderNpi
+   + String billingProviderLicense
+   + String billingProviderTin
+   + String billingProviderPhoneNumber
+   + String billingProviderAddlId
+   + Name treatingProviderName
+   + String treatingProviderNpi
+   + String treatingProviderLicense
+   + Address treatingProviderAddress
+   + String treatingProviderSpecialtyCode
+   + String treatingProviderPhoneNumber
+   + String treatingProviderAddlId
+}
+org.acme.membership.SubmittedDentalClaim --|> org.acme.membership.DentalClaim
+class org.acme.membership.SubmittedDentalServiceLine << (A,green) >> {
+   + String dentalServiceLineId
+   + Integer lineNumber
+   + DateTime procedureDate
+   + String areaOfOralCavity
+   + String toothSystem
+   + String toothNumberOrLetter
+   + String toothSurface
+   + String procedureCode
+   + String diagPointer
+   + Integer quantity
+   + String description
+   + BigDecimal fee
+}
+org.acme.membership.SubmittedDentalServiceLine --|> org.hyperledger.composer.system.Asset
+class org.acme.membership.AdjudicatedDentalServiceLine << (A,green) >> {
+   + Integer lineNumberx
+   + String procedureCodex
+   + Double chargeAmount
+   + Double approvedAmount
+   + Double allowedAmount
+   + Double deniedAmount
+   + Double copaymentAmount
+   + Double deductibleAmount
+   + Double paidAmount
+}
+org.acme.membership.AdjudicatedDentalServiceLine --|> org.acme.membership.SubmittedDentalServiceLine
+class org.acme.membership.AdjudicatedDentalClaim << (A,green) >> {
+   + Double amount
+   + SubmittedDentalClaim submittedDentalClaim
+}
+org.acme.membership.AdjudicatedDentalClaim --|> org.acme.membership.DentalClaim
+class org.acme.membership.CommunicationMethod << (E,grey) >> {
+   + EMAIL
+   + URL
+}
+class org.acme.membership.ElectronicCommunication {
+   + CommunicationMethod communicationMethod
+   + String emailAddress
+   + String URL
+}
+class org.acme.membership.EnrollmentChange << (A,green) >> {
+   + String enrollmentChangeId
+   + Name newName
+   + String newSocialSecurityNumber
+   + ElectronicCommunication[] newElectronicCommunications
+   + Phone[] newPhones
+   + Address newMemberAddress
+   + Period changePeriod
+   + Gender newGender
+   + String memberId
+   + Name memberName
+   + String socialSecurityNumber
+   + DateTime birthDate
+   + Gender gender
+   + Address address
+}
+org.acme.membership.EnrollmentChange --|> org.hyperledger.composer.system.Asset
+class org.acme.membership.EnrollmentAdditions << (A,green) >> {
+   + String enrollmentAdditionsId
+   + EnrollmentHeader header
+   + EnrollmentAddition[] enrollmentAdditions
+}
+org.acme.membership.EnrollmentAdditions --|> org.hyperledger.composer.system.Asset
+class org.acme.membership.EnrollmentAddition << (A,green) >> {
+   + String enrollmentAdditionId
+   + Name name
+   + Gender gender
+   + Address address
+   + String socialSecurityNumber
+   + DateTime dateOfBirth
+   + ElectronicCommunication[] electronicCommunications
+   + Phone[] phones
+   + Boolean handicapped
+   + BenefitStatus benefitStatus
+   + CobraQualifyingEvent cobraQualifyingEvent
+   + EmploymentStatus employmentStatus
+   + StudentStatus studentStatus
+   + DateTime deathOfSubscriberOrDependent
+   + DateTime educationBeginDate
+   + DateTime eligibilityEndDate
+   + String dateTimePeriodDescription
+}
+org.acme.membership.EnrollmentAddition --|> org.hyperledger.composer.system.Asset
+class org.acme.membership.SubscriberEnrollmentAddition << (A,green) >> {
+   + String employeeIdNumber
+   + DateTime employmentBeginDate
+}
+org.acme.membership.SubscriberEnrollmentAddition --|> org.acme.membership.EnrollmentAddition
+class org.acme.membership.MemberEnrollmentAddition << (A,green) >> {
+   + SubscriberEnrollmentAddition subscriberEnrollmentAddition
+}
+org.acme.membership.MemberEnrollmentAddition --|> org.acme.membership.EnrollmentAddition
+class org.acme.membership.EnrollmentDeletions << (A,green) >> {
+   + String enrollmentDeletionsId
+   + EnrollmentHeader header
+   + EnrollmentDelete[] enrollmentDeletions
+}
+org.acme.membership.EnrollmentDeletions --|> org.hyperledger.composer.system.Asset
+class org.acme.membership.EnrollmentDelete << (A,green) >> {
+   + String enrollmentDeleteId
+   + String identifier
+   + String socialSecurityNumber
+   + Name name
+   + DateTime dateOfBirth
+}
+org.acme.membership.EnrollmentDelete --|> org.hyperledger.composer.system.Asset
+class org.acme.membership.OrganizationalEntity << (A,green) >> {
+   + String organizationalEntityId
+   + String name
+   + Address address
+}
+org.acme.membership.OrganizationalEntity --|> org.hyperledger.composer.system.Asset
+class org.acme.membership.Group << (A,green) >> {
+   + Division[] divisions
+}
+org.acme.membership.Group --|> org.acme.membership.OrganizationalEntity
+class org.acme.membership.Division << (A,green) >> {
+   + Group group
+}
+org.acme.membership.Division --|> org.acme.membership.OrganizationalEntity
+class org.acme.membership.EnrollmentHeader {
+   + String payerNumber
+   + String payerName
+   + String groupNumber
+   + String groupName
+   + String groupTaxPayerIdNumber
+   + String divisionNumber
+   + String brokerNumber
+   + String brokerName
+   + String brokerTaxPayerIdNumber
+}
+class org.acme.membership.Benefit << (A,green) >> {
+   + String benefitId
+   + BenefitConstraint[] benefitConstraints
+}
+org.acme.membership.Benefit --|> org.hyperledger.composer.system.Asset
+class org.acme.membership.BenefitConstraint << (A,green) >> {
+   + String benefitConstraintsId
+   + String description
+   + String applyTo
+}
+org.acme.membership.BenefitConstraint --|> org.hyperledger.composer.system.Asset
+class org.acme.membership.Limit << (A,green) >> {
+   + BigDecimal limit
+}
+org.acme.membership.Limit --|> org.acme.membership.BenefitConstraint
+class org.acme.membership.Deductible << (A,green) >> {
+   + BigDecimal deductible
+}
+org.acme.membership.Deductible --|> org.acme.membership.BenefitConstraint
+class org.acme.membership.Copayment << (A,green) >> {
+   + BigDecimal copayment
+}
+org.acme.membership.Copayment --|> org.acme.membership.BenefitConstraint
+class org.acme.membership.BenefitPackage << (A,green) >> {
+   + Counter[] counters
+   + Coverage[] coverages
+}
+org.acme.membership.BenefitPackage --|> org.acme.membership.Benefit
+class org.acme.membership.CoverageType << (E,grey) >> {
+   + VISION
+   + DENTAL
+   + PSYCHIATRIC
+   + HEALTH
+}
+class org.acme.membership.Coverage << (A,green) >> {
+   + CoverageType coverageType
+   + BenefitPackage benefitPackage
+   + CoverageComponent[] coverageComponents
+}
+org.acme.membership.Coverage --|> org.acme.membership.Benefit
+class org.acme.membership.CoverageComponent << (A,green) >> {
+   + String description
+   + Coverage coverage
+   + CoverageDetail[] coverageDetails
+}
+org.acme.membership.CoverageComponent --|> org.acme.membership.Benefit
+class org.acme.membership.CoverageDetail << (A,green) >> {
+   + CoverageComponent converageComponent
+}
+org.acme.membership.CoverageDetail --|> org.acme.membership.Benefit
+class org.acme.membership.CoverageDetailNonPar << (A,green) >> {
+}
+org.acme.membership.CoverageDetailNonPar --|> org.acme.membership.CoverageDetail
+class org.acme.membership.CoverageDetailPar << (A,green) >> {
+}
+org.acme.membership.CoverageDetailPar --|> org.acme.membership.CoverageDetail
+class org.acme.membership.ServiceCode << (A,green) >> {
+   + String serviceCodeId
+}
+org.acme.membership.ServiceCode --|> org.hyperledger.composer.system.Asset
+class org.acme.membership.Counter << (A,green) >> {
+   + String counterId
+   + String description
+   + String[] tags
+}
+org.acme.membership.Counter --|> org.hyperledger.composer.system.Asset
+class org.acme.membership.MonetaryCounter << (A,green) >> {
+   + BigDecimal counter
+}
+org.acme.membership.MonetaryCounter --|> org.acme.membership.Counter
+class org.acme.membership.ServiceCounter << (A,green) >> {
+   + ServiceCode ServiceCode
+   + Integer counter
+}
+org.acme.membership.ServiceCounter --|> org.acme.membership.Counter
+class org.acme.membership.VisitCounter << (A,green) >> {
+   + Integer visits
+}
+org.acme.membership.VisitCounter --|> org.acme.membership.Counter
+class org.acme.membership.Payment << (A,green) >> {
+   + String paymentId
+   + Double amount
+   + AdjudicatedDentalClaim adjudicatedDentalClaim
+   + BillingProvider billingProvider
+}
+org.acme.membership.Payment --|> org.hyperledger.composer.system.Asset
+class org.acme.membership.Provider << (P,lightblue) >> {
+   + String npi
+   + Name name
+}
+org.acme.membership.Provider --|> org.hyperledger.composer.system.Participant
+class org.acme.membership.BillingProvider << (P,lightblue) >> {
+   + String tin
+   + SubmittedDentalClaim[] submittedDentalClaims
+   + Payment[] payments
+}
+org.acme.membership.BillingProvider --|> org.acme.membership.Provider
+class org.acme.membership.Person << (P,lightblue) >> {
+   + String personId
+   + Name name
+   + Address address
+   + ElectronicCommunication[] electronicCommunications
+   + Phone[] phones
+   + Gender gender
+   + DateTime dateOfBirth
+   + String socialSecurityNumber
+}
+org.acme.membership.Person --|> org.hyperledger.composer.system.Participant
+class org.acme.membership.Enrollee << (P,lightblue) >> {
+}
+org.acme.membership.Enrollee --|> org.acme.membership.Person
+class org.acme.membership.Subscriber << (P,lightblue) >> {
+   + String employer
+   + Dependent[] dependents
+   + SubscriberPlan[] subscriberPlans
+}
+org.acme.membership.Subscriber --|> org.acme.membership.Enrollee
+class org.acme.membership.EnrolleePlan << (A,green) >> {
+   + String enrolleePlanId
+   + Counter[] counters
+}
+org.acme.membership.EnrolleePlan --|> org.hyperledger.composer.system.Asset
+class org.acme.membership.SubscriberPlan << (A,green) >> {
+   + String subscriberPlanId
+   + Subscriber subscriber
+   + DentalPlan dentalPlan
+   + DateTime effectiveDate
+   + DateTime terminationDate
+   + Dependent[] dependents
+}
+org.acme.membership.SubscriberPlan --|> org.hyperledger.composer.system.Asset
+class org.acme.membership.Dependent << (P,lightblue) >> {
+   + Subscriber subscriber
+}
+org.acme.membership.Dependent --|> org.acme.membership.Enrollee
+class org.acme.membership.CreatePlan << (T,yellow) >> {
+}
+org.acme.membership.CreatePlan --|> org.hyperledger.composer.system.Transaction
+class org.acme.membership.CreateGroup << (T,yellow) >> {
+}
+org.acme.membership.CreateGroup --|> org.hyperledger.composer.system.Transaction
+class org.acme.membership.CreateSubscriber << (T,yellow) >> {
+}
+org.acme.membership.CreateSubscriber --|> org.hyperledger.composer.system.Transaction
+class org.acme.membership.CreateBillingProvider << (T,yellow) >> {
+}
+org.acme.membership.CreateBillingProvider --|> org.hyperledger.composer.system.Transaction
+class org.acme.membership.AdjudicateDentalClaim << (T,yellow) >> {
+   + SubmittedDentalClaim submittedDentalClaim
+}
+org.acme.membership.AdjudicateDentalClaim --|> org.hyperledger.composer.system.Transaction
+class org.acme.membership.PayDentalClaim << (T,yellow) >> {
+   + AdjudicatedDentalClaim adjudicatedDentalClaim
+}
+org.acme.membership.PayDentalClaim --|> org.hyperledger.composer.system.Transaction
+class org.acme.membership.CreateSubmittedClaim << (T,yellow) >> {
+}
+org.acme.membership.CreateSubmittedClaim --|> org.hyperledger.composer.system.Transaction
+class org.acme.membership.PostTransaction << (T,yellow) >> {
+   + SubmittedDentalClaim submittedDentalClaim
+}
+org.acme.membership.PostTransaction --|> org.hyperledger.composer.system.Transaction
+class org.acme.membership.AddEnrollees << (T,yellow) >> {
+   + EnrollmentAdditions enrollmentAdditions
+}
+org.acme.membership.AddEnrollees --|> org.hyperledger.composer.system.Transaction
+class org.acme.membership.DeleteEnrollees << (T,yellow) >> {
+   + EnrollmentDeletions enrollmentDeletions
+}
+org.acme.membership.DeleteEnrollees --|> org.hyperledger.composer.system.Transaction
+class org.acme.membership.ChangeEnrollee << (T,yellow) >> {
+}
+org.acme.membership.ChangeEnrollee --|> org.hyperledger.composer.system.Transaction
+class org.acme.membership.CancellEnrollee << (T,yellow) >> {
+}
+org.acme.membership.CancellEnrollee --|> org.hyperledger.composer.system.Transaction
+class org.acme.membership.ReinstateEnrollee << (T,yellow) >> {
+}
+org.acme.membership.ReinstateEnrollee --|> org.hyperledger.composer.system.Transaction
+class org.acme.membership.CorrectEnrollee << (T,yellow) >> {
+}
+org.acme.membership.CorrectEnrollee --|> org.hyperledger.composer.system.Transaction
+class org.acme.membership.AuditEnrollee << (T,yellow) >> {
+}
+org.acme.membership.AuditEnrollee --|> org.hyperledger.composer.system.Transaction
+class org.acme.membership.InformationEnrollee << (T,yellow) >> {
+}
+org.acme.membership.InformationEnrollee --|> org.hyperledger.composer.system.Transaction
+class org.acme.membership.StartAdjudicationEvent {
+   + AdjudicatedDentalClaim adjudicatedDentalClaim
+   + SubmittedDentalClaim submittedDentalClaim
+}
+org.acme.membership.StartAdjudicationEvent --|> org.hyperledger.composer.system.Event
+class org.acme.membership.PayDentalClaimEvent {
+   + AdjudicatedDentalClaim adjudicatedDentalClaim
+   + Payment payment
+}
+org.acme.membership.PayDentalClaimEvent --|> org.hyperledger.composer.system.Event
+class org.acme.cla.Instant {
+   + DateTime instant
+}
+class org.acm.Instant {
+   + DateTime instant
+}
+class org.h.Instant {
+   + DateTime instant
+}
+class org.hlt.Instant {
+   + DateTime instant
+}
+class org.hlt.fh.Instant {
+   + DateTime instant
+}
+class org.hlt.fhit.Instant {
+   + DateTime instant
+}
+class org.hlt.fhi.Instant {
+   + DateTime instant
+}
+class org.hlt.fhir.Instant {
+   + DateTime instant
+}
+class org.hlt.fhir.data.Instant {
+   + DateTime instant
+}
+class org.hlt.fhir.dataty.Instant {
+   + DateTime instant
+}
+class org.hlt.fhir.datatyp.Instant {
+   + DateTime instant
+}
+class org.hlt.fhir.datatyps.Instant {
+   + DateTime instant
+}
+class org.hlt.fhir.datatyps.Time {
+   + DateTime datetime
+}
+class org.hlt.fhir.datatyps.Date {
+   + DateTime datetime
+}
+class org.hlt.fhir.datatyps.DateTime {
+   + DateTime datetime
+}
+class org.hlt.fhir.datatyps.Decimal {
+   + Integer left
+   + Integer right
+}
+class org.hlt.fhir.datatyps.Integer {
+   + Integer integer
+}
+class org.hl7.fhir.datatyps.Element {
+}
+class org.hl7.fhir.datatyps.Instant {
+   + DateTime instant
+}
+org.hl7.fhir.datatyps.Instant --|> org.hl7.fhir.datatyps.Element
+class org.hl7.fhir.datatyps.Time {
+   + DateTime datetime
+}
+org.hl7.fhir.datatyps.Time --|> org.hl7.fhir.datatyps.Element
+class org.hl7.fhir.datatyps.Date {
+   + DateTime datetime
+}
+org.hl7.fhir.datatyps.Date --|> org.hl7.fhir.datatyps.Element
+class org.hl7.fhir.datatyps.DateTime {
+   + DateTime datetime
+}
+org.hl7.fhir.datatyps.DateTime --|> org.hl7.fhir.datatyps.Element
+class org.hl7.fhir.datatyps.Decimal {
+   + Integer left
+   + Integer right
+}
+org.hl7.fhir.datatyps.Decimal --|> org.hl7.fhir.datatyps.Element
+class org.hl7.fhir.datatyps.Integer {
+   + Integer integer
+}
+org.hl7.fhir.datatyps.Integer --|> org.hl7.fhir.datatyps.Element
+class org.hl7.fhir.datatyps.String {
+   + String string
+}
+org.hl7.fhir.datatyps.String --|> org.hl7.fhir.datatyps.Element
+class org.hl7.fhir.datatyps.Boolean {
+}
+org.hl7.fhir.datatyps.Boolean --|> org.hl7.fhir.datatyps.Element
+class org.hl7.fhir.datatyps.Base64Binary {
+}
+org.hl7.fhir.datatyps.Base64Binary --|> org.hl7.fhir.datatyps.Element
+class org.hl7.fhir.datatyps.Uri {
+   + String string
+}
+org.hl7.fhir.datatyps.Uri --|> org.hl7.fhir.datatyps.Element
+class org.hl7.fhir.datatypes.Element {
+}
+class org.hl7.fhir.datatypes.Instant {
+   + DateTime datetime
+}
+org.hl7.fhir.datatypes.Instant --|> org.hl7.fhir.datatypes.Element
+class org.hl7.fhir.datatypes.Time {
+   + DateTime datetime
+}
+org.hl7.fhir.datatypes.Time --|> org.hl7.fhir.datatypes.Element
+class org.hl7.fhir.datatypes.Date {
+   + DateTime datetime
+}
+org.hl7.fhir.datatypes.Date --|> org.hl7.fhir.datatypes.Element
+class org.hl7.fhir.datatypes.DateTime {
+   + DateTime datetime
+}
+org.hl7.fhir.datatypes.DateTime --|> org.hl7.fhir.datatypes.Element
+class org.hl7.fhir.datatypes.Decimal {
+   + Integer left
+   + Integer right
+}
+org.hl7.fhir.datatypes.Decimal --|> org.hl7.fhir.datatypes.Element
+class org.hl7.fhir.datatypes.Integer {
+   + Integer integer
+}
+org.hl7.fhir.datatypes.Integer --|> org.hl7.fhir.datatypes.Element
+class org.hl7.fhir.datatypes.String {
+   + String string
+}
+org.hl7.fhir.datatypes.String --|> org.hl7.fhir.datatypes.Element
+class org.hl7.fhir.datatypes.Boolean {
+}
+org.hl7.fhir.datatypes.Boolean --|> org.hl7.fhir.datatypes.Element
+class org.hl7.fhir.datatypes.Base64Binary {
+}
+org.hl7.fhir.datatypes.Base64Binary --|> org.hl7.fhir.datatypes.Element
+class org.hl7.fhir.datatypes.Uri {
+   + String string
+}
+org.hl7.fhir.datatypes.Uri --|> org.hl7.fhir.datatypes.Element
+class org.hl7.fhir.datatypes.Oid {
+}
+org.hl7.fhir.datatypes.Oid --|> org.hl7.fhir.datatypes.Uri
+right footer DATE
+@enduml
