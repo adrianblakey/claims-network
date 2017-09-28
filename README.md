@@ -47,51 +47,58 @@ is submitted and is potentially someone who coud receive payment for the claim d
 terms of the contract with the provider.
 
 **Transaction**
-`SubmitClaim` - this is simply the creation of a submitted claim asset as input to the processing.
-`AdjudicateDentalClaim` - this processes the claim, the processing starts by creating an ajudicated
+`CreateSubmittedClaim` - creates a submitted claim to start the process.
+`AdjudicateDentalClaim` - this processes the submitted claim, the processing starts by creating an ajudicated
 claim from the submitted claim and then evaluating it against the terms of a contract. If the claim
 is a pre-dtermination the result is an estimated payment, else the result is a payment or the claim is placed into a pend state in abyeance of additional information.
 `PayDentalClaim` - this pays the claim by sending a payment to the designated payee of the adjudicated claim.
+`PaymentCredits` - these are payment adjustments that are returned to the payer as over payments of some type,
+and might appear from the AR system.
 
 **Event**
-`SampleEvent`
+`PayClaimEvent` - notifiy a participant that the claim has been paid.
 
-SampleAssets are owned by a SampleParticipant, and the value property on a SampleAsset can be modified by submitting a SampleTransaction. The SampleTransaction emits a SampleEvent that notifies applications of the old and new values for each modified SampleAsset.
+A billing provider submits claims to the system to be paid or adjudicated. Once the claim 
+is submitted the adjudication processes is run against the claim. 
+If the claim type is a pre-determination the claim is asessed and a
+amount returned that would be paid if the claim is submitted as an encounter.
+If the claim is submitted as an encounter it's processed and a payment generated. The payment is made to the billing provider by running the payment transaction on the adjudicated claim that must be in a 
+"payable" state.
+
 
 To test this Business Network Definition in the **Test** tab:
 
-Create a `SampleParticipant` participant:
+Create a `BillingProvider` participant:
 
 ```
 {
-  "$class": "org.acme.sample.SampleParticipant",
+  "$class": "org.acme.claim.BillingProvider",
   "participantId": "Toby",
   "firstName": "Tobias",
   "lastName": "Hunter"
 }
 ```
 
-Create a `SampleAsset` asset:
+Create a `SubmittedDentalClaim` asset:
 
 ```
 {
-  "$class": "org.acme.sample.SampleAsset",
+  "$class": "org.acme.claim.SubmittedDentalClaim",
   "assetId": "assetId:1",
   "owner": "resource:org.acme.sample.SampleParticipant#Toby",
   "value": "original value"
 }
 ```
 
-Submit a `SampleTransaction` transaction:
+Submit a `AdjudicateDentalClaim` transaction:
 
 ```
 {
-  "$class": "org.acme.sample.SampleTransaction",
-  "asset": "resource:org.acme.sample.SampleAsset#assetId:1",
-  "newValue": "new value"
+  "$class": "org.acme.claim.AdjudicateDentalClaim",
 }
 ```
 
-After submitting this transaction, you should now see the transaction in the Transaction Registry and that a `SampleEvent` has been emitted. As a result, the value of the `assetId:1` should now be `new value` in the Asset Registry.
+Submit a `PayDentalClaim` transaction to pay the claim.
 
-Congratulations!
+After submitting this transaction, you should now see the transaction in the Transaction Registry and that a `AdjudicatedDentalClaim` and `Payment` have been emitted. As a result, the value of the `assetId:1` should now be `new value` in the Asset Registry.
+
