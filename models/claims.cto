@@ -149,8 +149,6 @@ concept Period {
   o DateTime to 
 }
 
-
-
 /**
  * The state of the adjudicated claim
  */
@@ -179,63 +177,10 @@ enum PatientsRelationshipToPolicyHolder {
   o OTHER 
 }
 
-/**
- * For Member
- */
-enum RelationshipToSubscriber {
-  o SPOUSE
-  o ADOPTED_CHILD
-  o FOSTER_CHILD
-  o WARD 
-  o STEP_CHILD
-  o SELF
-  o CHILD 
-  o SPONSORED_DEPENDENT
-  o EX_SPOUSE
-  o LIFE_PARTNER
-}
-
-/**
- * For Member
- */
-enum BenefitStatus {
-  o ACTIVE 
-  o COBRA 
-}
-
 enum Gender {
   o MALE
   o FEMALE
   o OTHER
-}
-
-enum CobraQualifyingEvent {
-  o TERMINATION
-  o REDUCTION_OF_HOURS
-  o MEDICARE  
-  o DEATH 
-  o DIVORCE 
-  o SEPARATION 
-  o INELIGIBLE_CHILD 
-  o BANKRUPTCY_OF_RETIRED_EMPLOYEE_EMPLOYER
-  o LAYOFF 
-  o LEAVE_OF_ABSENCE
-}
-
-enum EmploymentStatus {
-  o ACTIVE_MILITARY_OVERSEAS
-  o ACTIVE_MILITARY_USA
-  o FULL_TIME_ACTIVE_EMPLOYEE
-  o LEAVE_OF_ABSENCE
-  o PART_TIME_ACTIVE_EMPLOYEE
-  o RETIRED
-  o TERMINATED
-}
-
-enum StudentStatus {
-  o FULL_TIME 
-  o NOT_A_STUDENT
-  o PART_TIME 
 }
 
 enum DiagnosisCodeListQualifier {
@@ -247,30 +192,6 @@ enum TreatmentResultingFrom {
   o OCCUPATIONAL_ILLNESS
   o AUTO_ACCIDENT
   o OTHER
-}
-
-/**
- * Other coverage optionally submitted on a claim
- */
-concept DentalSubmittedOtherCoverage {
-  o HumanName nameOfPolicyHolder         // aka subscriber
-  o DateTime dateOfBirth
-  o Gender gender
-  o String memberId optional            // id of subscriber/policyholder
-  o String socialSecurityNumber optional  // one of these is mandatory
-  o String planOrGroupNumber
-  o PatientsRelationshipToPolicyHolder patientsRelationshipToPolicyHolder 
-  o String planName
-  o Address planAddress
-}
-
-/**
- * Plan or payer
- */
-asset DentalPlan identified by dentalPlanId {
-  o String dentalPlanId
-  o String name 
-  o Address address 
 }
 
 /**
@@ -293,6 +214,21 @@ abstract asset DentalClaim extends Claim {
 asset DentalClaimAttachment identified by dentalClaimAttachmentId {
   o String dentalClaimAttachmentId
   o Blob blob
+}
+
+/**
+ * Other coverage optionally submitted on a claim
+ */
+concept DentalSubmittedOtherCoverage {
+  o HumanName nameOfPolicyHolder         // aka subscriber
+  o DateTime dateOfBirth
+  o Gender gender
+  o String memberId optional            // id of subscriber/policyholder
+  o String socialSecurityNumber optional  // one of these is mandatory
+  o String planOrGroupNumber
+  o PatientsRelationshipToPolicyHolder patientsRelationshipToPolicyHolder 
+  o String planName
+  o Address planAddress
 }
 
 /**
@@ -429,258 +365,6 @@ asset MemberChange identified by memberChangeId {
 }
 
 /**
- * MEMBERSHIP
- */
-asset MemberAdditions identified by memberAdditionsId {
-  o String memberAdditionsId
-  o MemberHeader header
-  --> MemberAddition[] memberAdditions // sort these so the subscriber goes first
-}
-
-/**
- * Enroll a subscriber - someone directly insured
- * Enroll a member - dependent of a subscriber
- * MEMBERSHIP
- */
-asset MemberAddition identified by memberAdditionId {
-  o String memberAdditionId
-  //o RelationshipToSubscriber relationshipToSubscriber 
-  // Unique way to identify the subscriber SSN or ID or both
-  // if the relationship is not SELF
-  // expect a query to be run to determine this identifier first 
-  //o String subscriberId optional
-  //o String subscriberSocialSecurityNumber optional
-  // Subscriber to add if SELF, else member to add
-  o HumanName name
-  o Gender gender optional
-  o Address address
-  o String socialSecurityNumber optional // is there any tax reporting we need this for?
-  o DateTime dateOfBirth 
-  o ElectronicAddress[] electronicAddresses
-  o Phone[] phones
-  o Boolean handicapped default = false
-  // Reasons for the add TODO verify these are all reasons for an add 
-  // TODO COBRA is a changePeriod
-  o BenefitStatus benefitStatus // todo not needed ? active|cobra
-  o CobraQualifyingEvent cobraQualifyingEvent optional  //todo add?
-  o EmploymentStatus employmentStatus
-  o StudentStatus studentStatus
-
-  o DateTime deathOfSubscriberOrDependent optional // todo adds?
-
-  o DateTime educationBeginDate optional // todo for adds?
-  o DateTime eligibilityEndDate optional 
-  o String dateTimePeriodDescription optional
-}
-
-/**
- * MEMBERSHIP
- */
-asset SubscriberAddition extends MemberAddition {
-  o String employeeIdNumber optional
-  o DateTime employmentBeginDate optional
-}
-
-/**
- * MEMBERSHIP
- */
-asset DependentAddition extends SubscriberAddition {
-  o RelationshipToSubscriber relationshipToSubscriber 
-  --> SubscriberAddition subscriberAddition
-}
-
-/**
- * Delete one or more Members MEMBERSHIP
- */
-asset MemberDeletions identified by MemberDeletionsId {
-  o String MemberDeletionsId
-  o MemberHeader header
-  --> MemberDelete[] MemberDeletions
-}
-
-/**
- * MEMBERSHIP
- * Member identifiers to delete, remove an 
- * erroneous add - todo ordering to undo a graph? members before subscriber
- */
-asset MemberDelete identified by MemberDeleteId {
-  o String MemberDeleteId
-  // At least one unique way to identify the subscriber SSN or ID or both
-  // if the relationship is not SELF
-  o String identifier
-  o String socialSecurityNumber optional
-  o HumanName name optional
-  o DateTime dateOfBirth optional 
-}
-
-/**
- 8 MEMBERSHIP
- * Organizational groupings
- */
-abstract asset OrganizationalEntity identified by organizationalEntityId {
-  o String organizationalEntityId
-  o String name
-  o String displayName optional
-  o Address address optional
-  o Integer eligible default=0 
-  o Integer enrolled default=0
-  o DateTime lastEnroll
-  o DateTime reconciliation optional
-  o DateTime spanEnd optional 
-  o DateTime businessNetworkEnd optional 
-  o DateTime statusEnd optional
-  o Boolean continueCoverage default=false
-  o DateTime renewal optional
-}
-
-/**
- * MEMBERSHIP
- * Group
- */
-asset Group extends OrganizationalEntity {
-  --> Division[] divisions optional 
-  o String typeCode optional 
-  o String nationalAccountPrefix optional
-  o String nationalAccountIdentifier optional 
-  o String standardIndustryCode optional
-  o String natonalEmployerIdentifier optional 
-  o Boolean approval default=true 
-  o Boolean audit default=true 
-}
-
-/**
- * MEMBERSHIP
- * Division
- */
-asset Division extends OrganizationalEntity {
-  --> Group group
-}
-
-/**
- 8 MEMBERSHIP
- * Needed to identify every Member CRUD
- */
-concept MemberHeader {
-  // Payer identification
-  o String payerNumber
-  o String payerName optional
-  // Sponsor or group identifier
-  o String groupNumber 
-  o String groupName optional 
-  o String groupTaxPayerIdNumber optional // In lieu of the group number to id the group
-  o String divisionNumber optional // sub group
-  // Broker identification
-  o String brokerNumber optional
-  o String brokerName optional
-  o String brokerTaxPayerIdNumber optional 
-}
-
-/**
- * MEMBERSHIP
- * Benefit package hierarchy.
- * Four levesl in the hierachy:
- * BenefitPackage
- *   Coverage
- *      Component 
- *         Details (Network Participating and Non-Par. providers)
- * Each level inherits constraints from Benefit. Constraints may be:
- *   Limits
- *   Deductibiles
- *   Copayments
- */
-asset Benefit identified by benefitId {
-  o String benefitId
-  --> BenefitConstraint[] benefitConstraints optional // the constraints on the benefit
-}
-
-abstract asset BenefitConstraint identified by benefitConstraintsId {
-  o String benefitConstraintsId
-  o String description                 // description of the constraint
-  o String applyTo                     // What specfic benefit this applies to 
-}
-
-asset Limit extends BenefitConstraint {
-  o BigDecimal limit
-} 
-
-asset Deductible extends BenefitConstraint {
-  o BigDecimal deductible 
-}
-
-asset Copayment extends BenefitConstraint {
-  o BigDecimal copayment 
-}
-
-asset BenefitPackage extends Benefit {
-  --> Counter[] counters          // Overall accumulation for all members with a specific benefit package
-  --> Coverage[] coverages
-}
-
-enum CoverageType {
-  o VISION
-  o DENTAL 
-  o PSYCHIATRIC
-  o HEALTH
-}
-
-asset Coverage extends Benefit {
-  o CoverageType coverageType
-  --> BenefitPackage benefitPackage
-  --> CoverageComponent[] coverageComponents
-}
-
-asset CoverageComponent extends Benefit {
-  o String description
-  --> Coverage coverage
-  --> CoverageDetail[] coverageDetails 
-}
-
-abstract asset CoverageDetail extends Benefit {
-  --> CoverageComponent converageComponent
-}
-
-asset CoverageDetailNonPar extends CoverageDetail {
-}
-
-asset CoverageDetailPar extends CoverageDetail {
-}
-
-/**
- * More work here TODO
- */
-asset ServiceCode identified by serviceCodeId {
-  o String serviceCodeId
-}
-
-/**
- * Counters track benefits at the following levels:
- *  Member
- *  Contract
- * Three type of counters:
- *  1. Monetary
- *  2. Units of service
- *  3. Visits
- */
-abstract asset Counter identified by counterId {
-  o String counterId
-  o String description
-  o String[] tags
-}
-
-asset MonetaryCounter extends Counter {
-  o BigDecimal counter
-}
-
-asset ServiceCounter extends Counter {
-  o ServiceCode ServiceCode
-  o Integer counter
-}
-
-asset VisitCounter extends Counter {
-  o Integer visits
-}
-
-/**
  * A payment for a claim
  */
 asset Payment identified by paymentId {
@@ -710,185 +394,55 @@ participant BillingProvider extends HumanProvider {
 }
 
 /**
- * MEMBERSHIP - MIGHT BE COMMON
- * A basic person
+ * Create a submitted claim
  */
-participant Person identified by personId {
-  o String personId
-  o String personalIdentifier optional
-  o HumanName name 
-  o Address address optional
-  o ElectronicAddress[] electronicAddresses optional
-  o Phone[] phones optional 
-  o Gender gender
-  o DateTime dateOfBirth 
-  o DateTime deathDate optional 
-  o DateTime deathNotificationDate optional 
-  o String causeOfDeath optional 
-  o String socialSecurityNumber optional
-  o Boolean directiveOnFile default=false
-  o String desiredCommunicationMethod optional 
-  o String maritalStatus optional 
-  o String languageCode default='en-US'
-  o Boolean medicalNoPriorCoverage default=false
-  o Boolean dentalNoPriorCoverage default=false
-  o String ethnicity optional
-  o String race optional 
+transaction CreateSubmittedClaim {
 }
 
 /**
- * CAIM - maybe
- * Someone who is eligible for services by being enrolled in an insurance plan, AKA member
+ * Return all the submitted claims
  */
-participant Member extends Person {
-}
+ transaction GetAllSubmittedClaims {
+ }
 
-/**
- * CLAIM
- * A person who is enrolled in an insurance plan. AKA PolicyHolder
- */
-participant Subscriber extends Member {
-  o String employer optional
-  --> Dependent[] dependents optional // just named depdendents
-  --> SubscriberPlan[] subscriberPlans optional 
-}
-
-/**
- * Limit counters for and member in a plan (TODO is this right? 
- * plan == contract? lifetime counters?)
- */
-asset MemberPlan identified by memberPlanId {
-  o String memberPlanId
-  --> Counter[] counters optional            // The accumulation of benefits
-}
-
-/**
- * Plans in which the subscriber is enrolled
- */
-asset SubscriberPlan identified by subscriberPlanId {
-  o String subscriberPlanId
-  --> Subscriber subscriber
-  --> DentalPlan dentalPlan
-  o DateTime effectiveDate
-  o DateTime terminationDate
-  --> Dependent[] dependents // insured dependents
-}
-
-/**
- * Dependent of the Member/subscriber
- */
-participant Dependent extends Member {
-  o RelationshipToSubscriber relationshipToSubscriber
-  --> Subscriber subscriber     // For which of the subscriber's plans?
-}
-
-/**
- * Create a plan for testing
- */
-transaction CreatePlan {
-}
-
-/**
- * Create a group for testing
- */
-transaction CreateGroup {
-}
-
-/**
- * Create a plan subcriber - directly insured by the plan
- */
-transaction CreateSubscriber {
-}
-
-/**
- * Create a billing provider
- */
-transaction CreateBillingProvider {
-}
-
-/**
+/*
  * Adjudicate a submitted claim
  */
 transaction AdjudicateDentalClaim {
   --> SubmittedDentalClaim submittedDentalClaim
 }
 
+/**
+ * Pay an adjudicated claim
+ */
 transaction PayDentalClaim {
   --> AdjudicatedDentalClaim adjudicatedDentalClaim
 }
 
 /**
- * Create a submitted claim
+ * Credit back over payments for a claim
  */
-transaction CreateSubmittedClaim {
-}
-
-transaction PostTransaction {
-  --> SubmittedDentalClaim submittedDentalClaim
+transaction PaymentCredits {
+  --> AdjudicatedDentalClaim adjudicatedDentalClaim
 }
 
 /**
- * Add new members(s)
- * Add a new dependent, partner 
+ * Experimental call out - to verify service codee
  */
-transaction AddMembers {
-  --> MemberAdditions MemberAdditions
+ transaction PostTransaction {
 }
 
 /**
- * Delete incorrect coverage record(s) - correct a mistake
+ * Inform the client that an adjudication has started
  */
-transaction DeleteMembers {
-  --> MemberDeletions MemberDeletions
-}
-
-/**
- * Change member details like what?
- * Change of address
- * Change of name
- * Change to COBRA
- * Remove a dependent (student, age 26, divorce ...)
- * 
- */
-transaction ChangeMember {
-}
-
-/**
- * Cancel Member
- */
-transaction CancellMember {
-}
-
-/**
- * Reinstate member
- */
-transaction ReinstateMember {
-}
-
-/**
- * Correct member
- */
-transaction CorrectMember {
-}
-
-/**
- * Audit/compare member
- */
-transaction AuditMember {
-}
-
-/**
- * Employee information
- */
-transaction InformationMember {
-}
-
 event StartAdjudicationEvent {
   --> AdjudicatedDentalClaim adjudicatedDentalClaim
   --> SubmittedDentalClaim submittedDentalClaim
 }
 
+/**
+ * Pay an adjudicated claim
+ */
 event PayDentalClaimEvent {
   --> AdjudicatedDentalClaim adjudicatedDentalClaim
-  --> Payment payment
 }
