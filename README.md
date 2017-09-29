@@ -7,10 +7,7 @@ other ledgers/channels.
 
 This business network defines:  
 
-**Participant** 
-`SampleParticipant`  
-
-**Asset**  
+**Assets**  
 `Claim` - abstract supertype of all the claims types.  
 `DentalClaim` - abstract supertype of the dental claims - namely submitted and adjudicated. A complete model shall have medical, hosptial, pharmacy etc. claim types, which would also extend Claim.  
 `SubmittedDentalClaim` - a representation of a ADA dental claims form, that captures the claims input and
@@ -46,16 +43,18 @@ the subscriber - TODO is this needed? must this be the same model as the members
 is submitted and is potentially someone who coud receive payment for the claim depending on the 
 terms of the contract with the provider.  
 
-**Transaction**
+**Transactions**  
 `CreateSubmittedClaim` - creates a submitted claim to start the process.  
 `AdjudicateDentalClaim` - this processes the submitted claim, the processing starts by creating an ajudicated
 claim from the submitted claim and then evaluating it against the terms of a contract. If the claim
 is a pre-dtermination the result is an estimated payment, else the result is a payment or the claim is placed into a pend state in abyeance of additional information.  
 `PayDentalClaim` - this pays the claim by sending a payment to the designated payee of the adjudicated claim.  
 `PaymentCredits` - these are payment adjustments that are returned to the payer as over payments of some type,
-and might appear from the AR system.  
+and might appear from the AR system. 
+`GetAllSubmittedClaims` - returns all the submitted claims an writes their ids to the console log.   
+`PostTransaction` - this is a test of the http post - experimental ...  
 
-**Event**  
+**Events**  
 `PayClaimEvent` - notifiy a participant that the claim has been paid.  
 
 A billing provider submits claims to the system to be paid or adjudicated. Once the claim 
@@ -99,9 +98,9 @@ Submit a `AdjudicateDentalClaim` transaction:
   "submittedDentalClaim": "resource:org.acme.claim.SubmittedDentalClaim#1"
 }
 ```
+
 You should then have an AdjudicatedClaim like this:
-...
-1
+```
 {
   "$class": "org.acme.claim.AdjudicatedDentalClaim",
   "claimStatus": "HELD",
@@ -110,15 +109,15 @@ You should then have an AdjudicatedClaim like this:
   "dentalClaimType": "ENCOUNTER",
   "claimId": "1"
 }
-...
+```
 
 Submit a `PayDentalClaim` transaction to pay the claim.
-...
+```
 {
   "$class": "org.acme.claim.PayDentalClaim",
   "adjudicatedDentalClaim": "resource:org.acme.claim.AdjudicatedDentalClaim#1"
 }
-...
+```
 
 After submitting this transaction, you should now see the transaction in the Transaction Registry and that a `AdjudicatedDentalClaim` and `Payment` have been emitted. As a result, the value of the `assetId:1` should now be `new value` in the Asset Registry.
 
