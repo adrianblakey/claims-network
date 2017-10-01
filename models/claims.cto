@@ -15,7 +15,7 @@ concept Address {
   o String county optional
   o String state 
   o String postcode
-  o String country default = "USA" // is there a way to default this?
+  o String country default = "USA"
 }
 
 enum PhoneType {
@@ -235,7 +235,9 @@ concept DentalSubmittedOtherCoverage {
  * The incoming submitted claim,
  * Direct representation of a claim form containing textual information - as submitted
  */
+@description("The incoming, submitted dental claim.")
 asset SubmittedDentalClaim extends DentalClaim {
+  @description("An optional identifier of a predetermination claim.")
   o String predeterminationClaimId optional            // Null if the claim type is a PRED
   // Insurance company, plan information
   o String planName
@@ -403,6 +405,12 @@ transaction CreateSubmittedClaim {
  * Return all the submitted claims
  */
  transaction GetAllSubmittedClaims {
+ }
+
+/**
+ * Get a submitted claims
+ */
+ transaction GetSubmittedClaim {
  }
 
 /*
