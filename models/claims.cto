@@ -238,6 +238,7 @@ concept DentalSubmittedOtherCoverage {
 @description("The incoming, submitted dental claim.")
 asset SubmittedDentalClaim extends DentalClaim {
   @description("An optional identifier of a predetermination claim.")
+  @validation("NULLIF:dentalClaimType=PRED")
   o String predeterminationClaimId optional            // Null if the claim type is a PRED
   // Insurance company, plan information
   o String planName
@@ -411,6 +412,7 @@ transaction CreateSubmittedClaim {
  * Get a submitted claims
  */
  transaction GetSubmittedClaim {
+   o String dentalClaimId
  }
 
 /*
