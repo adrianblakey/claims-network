@@ -42,7 +42,7 @@
     "eslint": "^3.6.1",
     "istanbul": "^0.4.5",
     "jsdoc": "^3.5.5",
-    "license-check": "~2.0.6",
+    "license-check-and-add": "~2.0.6",
     "mkdirp": "^0.5.1",
     "mocha": "^3.2.0",
     "moment": "^2.17.1",
